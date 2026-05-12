@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Periodic Table of Elements</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,600;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --nav-w:260px;
+  --bg:#141414;--surface:#1e1e1e;--surface2:#272727;--surface3:#303030;
+  --border:rgba(255,255,255,0.08);--border-md:rgba(255,255,255,0.15);--border-hi:rgba(255,255,255,0.24);
+  --text:#f0ede8;--text2:#9e9b94;--text3:#56544f;
+  --alkali-bg:#7a4a10;--alkali-tx:#f5c97a;--alkali-br:#c07820;
+  --alkaline-bg:#5a3a08;--alkaline-tx:#e8b060;--alkaline-br:#a06418;
+  --transition-bg:#1a3a5a;--transition-tx:#7ab8e8;--transition-br:#2a5a8a;
+  --post-bg:#1a3a20;--post-tx:#78c888;--post-br:#2a6030;
+  --metalloid-bg:#3a2a60;--metalloid-tx:#a898e8;--metalloid-br:#5a409a;
+  --nonmetal-bg:#1a4a40;--nonmetal-tx:#70d4b8;--nonmetal-br:#1a7060;
+  --halogen-bg:#4a1a3a;--halogen-tx:#d888b8;--halogen-br:#7a2860;
+  --noble-bg:#2e2e32;--noble-tx:#a8a8bc;--noble-br:#505068;
+  --lanthanide-bg:#1a2a4a;--lanthanide-tx:#80a8d8;--lanthanide-br:#2a4070;
+  --actinide-bg:#2a1a4a;--actinide-tx:#a888d0;--actinide-br:#4a2a78;
+}
+html,body{height:100%;font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);overflow:hidden}
+.layout{display:flex;height:100vh}
+
+/* NAV */
+nav{width:var(--nav-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden}
+nav::-webkit-scrollbar{width:3px}nav::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:3px}
+.nav-head{padding:18px 16px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:10}
+.nav-head h1{font-family:'Fraunces',serif;font-size:15px;font-weight:600;letter-spacing:-0.3px;line-height:1.3}
+.nav-head p{font-size:10px;color:var(--text3);margin-top:3px}
+.nav-sec{border-bottom:1px solid var(--border)}
+.nav-btn{width:100%;padding:9px 14px;display:flex;align-items:center;gap:9px;background:none;border:none;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--text2);text-align:left;transition:background 0.12s}
+.nav-btn:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+.nav-btn.active{color:var(--text);background:rgba(255,255,255,0.05)}
+.nav-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.nav-cnt{margin-left:auto;font-size:10px;color:var(--text3);background:rgba(255,255,255,0.06);padding:1px 6px;border-radius:10px}
+.nav-arr{font-size:11px;color:var(--text3);transition:transform 0.2s;display:inline-block}
+.nav-btn.open .nav-arr{transform:rotate(90deg)}
+.nav-els{overflow:hidden;max-height:0;transition:max-height 0.3s ease}
+.nav-els.open{max-height:800px}
+.nav-gdesc{padding:6px 14px 8px 34px;font-size:10px;color:var(--text3);line-height:1.6;border-bottom:1px solid var(--border)}
+.nav-chips{padding:6px 8px 10px 34px;display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:10px;padding:3px 9px;border-radius:4px;cursor:pointer;border:1px solid transparent;font-family:'DM Mono',monospace;font-weight:500;transition:transform 0.1s,box-shadow 0.12s}
+.chip:hover{transform:scale(1.13);box-shadow:0 2px 12px rgba(0,0,0,0.5)}
+.nav-foot{padding:12px 16px;border-top:1px solid var(--border);font-size:9px;color:var(--text3);line-height:1.8;position:sticky;bottom:0;background:var(--surface)}
+
+/* MAIN */
+main{flex:1;overflow:auto;padding:20px 18px 40px;display:flex;flex-direction:column;gap:14px}
+main::-webkit-scrollbar{width:5px;height:5px}
+main::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:4px}
+.main-title h2{font-family:'Fraunces',serif;font-size:22px;font-weight:300;letter-spacing:-0.5px}
+.main-title p{font-size:10px;color:var(--text3);margin-top:3px}
+.legend{display:flex;flex-wrap:wrap;gap:10px}
+.leg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);cursor:pointer;user-select:none}
+.leg:hover{color:var(--text)}.leg-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.fbar{display:flex;flex-wrap:wrap;gap:6px}
+.fbtn{padding:5px 12px;border-radius:16px;font-size:10px;cursor:pointer;border:1px solid transparent;font-family:'DM Mono',monospace;font-weight:500;transition:all 0.12s;color:var(--text2);background:var(--surface2)}
+.fbtn:hover{color:var(--text);border-color:var(--border-md)}
+.fbtn.all.active{background:var(--text);color:var(--bg)}
+.ipanel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:none;animation:fi 0.18s ease}
+.ipanel.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.ipanel h3{font-family:'Fraunces',serif;font-size:15px;font-weight:300;margin-bottom:5px}
+.ipanel p{font-size:11px;color:var(--text2);line-height:1.7}
+.istats{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.istat{border-radius:7px;padding:7px 14px}
+.istat .sv{font-size:18px;font-weight:500}.istat .sl{font-size:9px;margin-top:1px;opacity:0.6;letter-spacing:0.4px;text-transform:uppercase}
+
+/* GRID */
+.pt-scroll{overflow-x:auto}.pt-scroll::-webkit-scrollbar{height:3px}.pt-scroll::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:3px}
+.ghdr{display:grid;grid-template-columns:repeat(18,minmax(36px,1fr));gap:2px;min-width:680px;margin-bottom:3px}
+.gh{font-size:9px;color:var(--text3);text-align:center}
+.pgrid{display:grid;grid-template-columns:repeat(18,minmax(36px,1fr));gap:2px;min-width:680px}
+.el{border-radius:5px;padding:2px;cursor:pointer;text-align:center;min-height:52px;display:flex;flex-direction:column;justify-content:center;align-items:center;border:1px solid transparent;transition:transform 0.1s,opacity 0.18s;position:relative}
+.el:hover{transform:scale(1.2);z-index:50}
+.el.dim{opacity:0.1}.el.hl{outline:2px solid var(--text);outline-offset:1px;z-index:5}
+.el .n{font-size:8px;opacity:0.65;line-height:1.2}.el .s{font-size:14px;font-weight:500;line-height:1.3}
+.el .nm{font-size:7px;opacity:0.6;line-height:1.2;white-space:nowrap;overflow:hidden;max-width:100%}
+.gcell{background:transparent;border:none;pointer-events:none;min-height:52px}
+.ph{background:rgba(255,255,255,0.04);border:1px dashed var(--border-md);border-radius:5px;min-height:52px;display:flex;align-items:center;justify-content:center}
+.ph span{font-size:9px;color:var(--text3)}.sep{grid-column:1/-1;height:10px}
+.rlbl{grid-column:1/-1;font-size:9px;color:var(--text3);padding:3px 2px 1px;letter-spacing:0.5px}
+
+/* HOVER TOOLTIP */
+#tip{position:fixed;background:#1a1a1e;border:1px solid rgba(255,255,255,0.18);border-radius:12px;padding:14px 18px;font-size:12px;z-index:9999;pointer-events:none;display:none;min-width:200px;box-shadow:0 12px 40px rgba(0,0,0,0.7)}
+.t-sym{font-size:34px;font-weight:500;line-height:1;font-family:'Fraunces',serif}
+.t-name{font-size:15px;font-weight:500;margin:4px 0 3px}
+.t-badge{display:inline-block;font-size:10px;padding:2px 9px;border-radius:12px;margin-bottom:8px;font-weight:500}
+.t-row{font-size:11px;color:var(--text2);margin:2px 0}.t-row b{color:var(--text)}
+.t-div{border-top:1px solid rgba(255,255,255,0.08);margin:7px 0}
+.t-hint{font-size:10px;color:var(--text3)}
+
+/* ═══════════════════════════════════════
+   MODAL
+═══════════════════════════════════════ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.22s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:#1a1a1e;border:1px solid var(--border-hi);border-radius:18px;width:720px;max-width:96vw;max-height:92vh;display:flex;flex-direction:column;transform:translateY(20px) scale(0.97);transition:transform 0.22s;box-shadow:0 28px 90px rgba(0,0,0,0.85)}
+.overlay.open .modal{transform:none}
+.modal::-webkit-scrollbar{width:4px}.modal::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:4px}
+
+/* Modal header */
+.m-head{padding:22px 26px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:18px;flex-shrink:0}
+.m-symbox{width:76px;height:76px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;border:1px solid transparent}
+.m-sym{font-family:'Fraunces',serif;font-size:34px;font-weight:600;line-height:1}
+.m-znum{font-size:11px;opacity:0.7;margin-top:2px}
+.m-info{flex:1;min-width:0}
+.m-name{font-family:'Fraunces',serif;font-size:24px;font-weight:300;letter-spacing:-0.4px;line-height:1.2}
+.m-tagline{font-size:10px;color:var(--text3);margin:4px 0 8px;line-height:1.5}
+.m-badges{display:flex;flex-wrap:wrap;gap:5px}
+.mbadge{font-size:10px;padding:3px 10px;border-radius:10px;border:1px solid transparent;font-weight:500}
+.m-close{background:none;border:1px solid var(--border);border-radius:8px;color:var(--text2);cursor:pointer;font-size:14px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.12s}
+.m-close:hover{background:rgba(255,255,255,0.08);color:var(--text)}
+
+/* TABS */
+.m-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 26px;flex-shrink:0;background:#1a1a1e}
+.mtab{padding:10px 16px;font-size:11px;font-weight:500;font-family:'DM Mono',monospace;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s;user-select:none;background:none;border-top:none;border-left:none;border-right:none}
+.mtab:hover{color:var(--text2)}
+.mtab.active{color:var(--text);border-bottom-color:currentColor}
+
+/* Tab panels */
+.m-panels{overflow-y:auto;flex:1}
+.m-panels::-webkit-scrollbar{width:4px}.m-panels::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:4px}
+.tpanel{display:none;padding:22px 26px 28px;flex-direction:column;gap:20px}
+.tpanel.active{display:flex}
+
+/* Section */
+.msec{display:flex;flex-direction:column;gap:10px}
+.msec-title{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+/* Stat grid */
+.mstats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:7px}
+.mstat{background:var(--surface2);border-radius:8px;padding:10px 13px;border:1px solid var(--border)}
+.mstat .mk{font-size:9px;color:var(--text3);letter-spacing:0.3px;margin-bottom:4px;text-transform:uppercase}
+.mstat .mv{font-size:13px;font-weight:500;color:var(--text);line-height:1.3}
+.mstat .mu{font-size:9px;color:var(--text2)}
+
+/* Prop rows */
+.mprops{display:flex;flex-direction:column}
+.mprop{display:flex;align-items:baseline;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)}
+.mprop:last-child{border-bottom:none}
+.mprop .pk{font-size:11px;color:var(--text2);min-width:170px;flex-shrink:0}
+.mprop .pv{font-size:11px;color:var(--text);font-weight:500;line-height:1.5}
+
+/* Electron shells */
+.e-config{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 0}
+.e-shell{display:flex;flex-direction:column;align-items:center;gap:3px}
+.e-ring{width:30px;height:30px;border-radius:50%;border:1.5px solid;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500}
+.e-lbl{font-size:8px;color:var(--text3)}
+.e-arrow{font-size:10px;color:var(--text3)}
+
+/* Uses */
+.m-uses{display:flex;flex-wrap:wrap;gap:6px}
+.use-tag{font-size:10px;padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2)}
+
+/* Fun fact */
+.m-fact{border-radius:10px;padding:14px 16px;border-left:3px solid;font-size:11px;color:var(--text2);line-height:1.8;background:var(--surface2)}
+.m-fact b{color:var(--text)}
+
+/* Discovery */
+.m-disc{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.dcard{background:var(--surface2);border-radius:8px;padding:10px 14px;border:1px solid var(--border)}
+.dcard .dk{font-size:9px;color:var(--text3);letter-spacing:0.3px;text-transform:uppercase;margin-bottom:4px}
+.dcard .dv{font-size:12px;color:var(--text);font-weight:500;line-height:1.4}
+
+/* Reactivity bar */
+.rbar-wrap{display:flex;flex-direction:column;gap:6px}
+.rbar-row{display:flex;align-items:center;gap:10px}
+.rbar-lbl{font-size:10px;color:var(--text2);min-width:140px}
+.rbar-track{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.06);overflow:hidden}
+.rbar-fill{height:100%;border-radius:3px;transition:width 0.6s ease}
+.rbar-val{font-size:10px;color:var(--text2);min-width:36px;text-align:right}
+
+/* Isotopes */
+.isotope-grid{display:flex;flex-wrap:wrap;gap:6px}
+.iso{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:10px;color:var(--text2);line-height:1.5}
+.iso .isym{font-size:12px;font-weight:500;color:var(--text)}
+
+/* ═══════════════════════════════════════
+   QUIZ TAB
+═══════════════════════════════════════ */
+.quiz-wrap{display:flex;flex-direction:column;gap:16px}
+
+/* Score header */
+.quiz-score-bar{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border-radius:10px;padding:10px 16px;border:1px solid var(--border)}
+.qs-label{font-size:11px;color:var(--text2)}
+.qs-score{font-size:16px;font-weight:500;color:var(--text)}
+.qs-prog{display:flex;gap:4px;align-items:center}
+.qs-dot{width:8px;height:8px;border-radius:50%;background:var(--border-md)}
+.qs-dot.done-ok{background:#4CAF50}.qs-dot.done-fail{background:#e25555}
+
+/* Question card */
+.q-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px}
+.q-num{font-size:9px;color:var(--text3);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px}
+.q-text{font-size:14px;color:var(--text);line-height:1.6;font-family:'Fraunces',serif;font-weight:300;margin-bottom:16px}
+.q-options{display:flex;flex-direction:column;gap:8px}
+.q-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:1px solid var(--border-md);cursor:pointer;background:var(--surface3);transition:all 0.13s;font-size:12px;color:var(--text2);text-align:left;font-family:'DM Mono',monospace;width:100%}
+.q-opt:hover:not(:disabled){background:rgba(255,255,255,0.06);border-color:var(--border-hi);color:var(--text)}
+.q-opt:disabled{cursor:default}
+.q-opt.correct{background:rgba(76,175,80,0.15);border-color:#4CAF50;color:#7dd87f}
+.q-opt.wrong{background:rgba(226,85,85,0.15);border-color:#e25555;color:#e88888}
+.q-opt.reveal{background:rgba(76,175,80,0.08);border-color:#4CAF5066;color:#7dd87f}
+.q-opt-letter{width:20px;height:20px;border-radius:4px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.q-opt.correct .q-opt-letter{background:#4CAF50;color:#fff}
+.q-opt.wrong .q-opt-letter{background:#e25555;color:#fff}
+
+/* Feedback */
+.q-feedback{padding:12px 14px;border-radius:8px;font-size:11px;line-height:1.7;display:none;margin-top:4px}
+.q-feedback.show{display:block}
+.q-feedback.ok{background:rgba(76,175,80,0.12);border:1px solid #4CAF5040;color:#9de0a0}
+.q-feedback.fail{background:rgba(226,85,85,0.12);border:1px solid #e2555540;color:#e89090}
+
+/* Quiz nav */
+.q-nav{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.qbtn{background:none;border:1px solid var(--border-md);border-radius:8px;color:var(--text2);cursor:pointer;font-size:11px;padding:7px 16px;font-family:'DM Mono',monospace;font-weight:500;transition:all 0.12s}
+.qbtn:hover:not(:disabled){background:rgba(255,255,255,0.06);color:var(--text);border-color:var(--border-hi)}
+.qbtn:disabled{opacity:0.3;cursor:default}
+.qbtn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+.qbtn.primary:hover{opacity:0.9}
+
+/* Final result */
+.quiz-result{display:none;flex-direction:column;align-items:center;gap:14px;padding:20px 10px;text-align:center}
+.quiz-result.show{display:flex}
+.result-score{font-family:'Fraunces',serif;font-size:52px;font-weight:300;line-height:1}
+.result-label{font-size:13px;color:var(--text2);line-height:1.6}
+.result-grade{font-size:11px;padding:4px 14px;border-radius:12px;font-weight:500;margin-top:2px}
+.result-breakdown{display:flex;gap:20px;margin-top:4px}
+.rb-item{font-size:11px;color:var(--text2)}.rb-item b{color:var(--text)}
+
+/* Modal footer nav */
+.m-foot{padding:14px 26px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.mfbtn{background:none;border:1px solid var(--border);border-radius:8px;color:var(--text2);cursor:pointer;font-size:11px;padding:6px 14px;font-family:'DM Mono',monospace;transition:all 0.12s}
+.mfbtn:hover:not(:disabled){background:rgba(255,255,255,0.06);color:var(--text);border-color:var(--border-md)}
+.mfbtn:disabled{opacity:0.28;cursor:default}
+.m-foot-center{font-size:10px;color:var(--text3)}
+
+/* ═══════════════════════════════════════
+   GROUP MODAL
+═══════════════════════════════════════ */
+.g-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:3000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.22s}
+.g-overlay.open{opacity:1;pointer-events:all}
+.g-modal{background:#1a1a1e;border:1px solid var(--border-hi);border-radius:18px;width:740px;max-width:96vw;max-height:92vh;display:flex;flex-direction:column;transform:translateY(20px) scale(0.97);transition:transform 0.22s;box-shadow:0 28px 90px rgba(0,0,0,0.85)}
+.g-overlay.open .g-modal{transform:none}
+.g-modal::-webkit-scrollbar{width:4px}.g-modal::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:4px}
+
+/* group modal header */
+.gm-head{padding:24px 28px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:16px;flex-shrink:0}
+.gm-icon{width:60px;height:60px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid transparent;font-family:'Fraunces',serif;font-size:22px;font-weight:600}
+.gm-info{flex:1;min-width:0}
+.gm-title{font-family:'Fraunces',serif;font-size:26px;font-weight:300;letter-spacing:-0.4px}
+.gm-sub{font-size:10px;color:var(--text3);margin:4px 0 8px;line-height:1.5}
+.gm-badges{display:flex;flex-wrap:wrap;gap:5px}
+.gm-badge{font-size:10px;padding:3px 10px;border-radius:10px;border:1px solid transparent;font-weight:500}
+.gm-close{background:none;border:1px solid var(--border);border-radius:8px;color:var(--text2);cursor:pointer;font-size:14px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.12s}
+.gm-close:hover{background:rgba(255,255,255,0.08);color:var(--text)}
+
+/* group modal tabs */
+.gm-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 28px;flex-shrink:0;background:#1a1a1e}
+.gmtab{padding:10px 16px;font-size:11px;font-weight:500;font-family:'DM Mono',monospace;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s;user-select:none;background:none;border-top:none;border-left:none;border-right:none}
+.gmtab:hover{color:var(--text2)}.gmtab.active{color:var(--text);border-bottom-color:currentColor}
+
+/* group modal panels */
+.gm-panels{overflow-y:auto;flex:1}
+.gm-panels::-webkit-scrollbar{width:4px}.gm-panels::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:4px}
+.gtpanel{display:none;padding:22px 28px 28px;flex-direction:column;gap:20px}
+.gtpanel.active{display:flex}
+
+/* group elements grid */
+.gel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px}
+.gel-card{border-radius:8px;padding:8px 6px;border:1px solid transparent;cursor:pointer;text-align:center;transition:transform 0.1s,box-shadow 0.1s;display:flex;flex-direction:column;gap:2px}
+.gel-card:hover{transform:scale(1.06);box-shadow:0 4px 16px rgba(0,0,0,0.4)}
+.gel-z{font-size:8px;opacity:0.65}
+.gel-sym{font-size:16px;font-weight:500}
+.gel-name{font-size:7px;opacity:0.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* trend bars */
+.trend-wrap{display:flex;flex-direction:column;gap:8px}
+.trend-row{display:flex;align-items:center;gap:10px}
+.trend-lbl{font-size:10px;color:var(--text2);min-width:160px;flex-shrink:0}
+.trend-bar{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,0.06);overflow:hidden;position:relative}
+.trend-fill{height:100%;border-radius:4px}
+.trend-val{font-size:10px;color:var(--text2);min-width:50px;text-align:right}
+
+/* key facts list */
+.kf-list{display:flex;flex-direction:column;gap:0}
+.kf-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.kf-item:last-child{border-bottom:none}
+.kf-bullet{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.kf-text{font-size:11px;color:var(--text2);line-height:1.7}
+.kf-text b{color:var(--text)}
+
+/* comparison table */
+.cmp-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.cmp-tbl th{font-size:9px;letter-spacing:0.8px;text-transform:uppercase;color:var(--text3);padding:6px 8px;text-align:left;border-bottom:1px solid var(--border);font-weight:500}
+.cmp-tbl td{padding:8px 8px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle}
+.cmp-tbl tr:last-child td{border-bottom:none}
+.cmp-tbl tr:hover td{background:rgba(255,255,255,0.03)}
+.cmp-sym{font-size:13px;font-weight:500;margin-right:4px}
+
+/* nav button — split layout */
+.nav-btn-row{width:100%;display:flex;align-items:center;border-bottom:1px solid var(--border)}
+.nav-btn-label{flex:1;padding:9px 14px;display:flex;align-items:center;gap:9px;background:none;border:none;cursor:pointer;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--text2);text-align:left;transition:background 0.12s;min-width:0}
+.nav-btn-label:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+.nav-btn-label.active{color:var(--text);background:rgba(255,255,255,0.04)}
+.nav-btn-toggle{padding:9px 12px;background:none;border:none;border-left:1px solid var(--border);cursor:pointer;color:var(--text3);transition:background 0.12s,transform 0.2s;flex-shrink:0;font-size:13px}
+.nav-btn-toggle:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+.nav-btn-toggle.open{transform:rotate(90deg)}
+.nav-open-btn{font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid transparent;font-family:'DM Mono',monospace;font-weight:500;cursor:pointer;transition:opacity 0.12s;margin-left:2px;flex-shrink:0}
+.nav-open-btn:hover{opacity:0.8}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- LEFT NAV -->
+<nav id="sidenav">
+  <div class="nav-head">
+    <h1>Periodic Table</h1>
+    <p>118 elements · 10 groups · quiz included</p>
+  </div>
+  <div id="nav-body"></div>
+  <div class="nav-foot">Click group header → filter table<br>Click element symbol → full detail + quiz</div>
+</nav>
+
+<!-- MAIN -->
+<main>
+  <div class="main-title">
+    <h2>Elements &amp; Group Properties</h2>
+    <p>Color-coded by element group · 118 elements · IUPAC standard layout</p>
+  </div>
+  <div class="legend" id="legend"></div>
+  <div class="fbar" id="fbar"></div>
+  <div id="ipanel" class="ipanel"></div>
+  <div class="pt-scroll">
+    <div class="ghdr" id="ghdr"></div>
+    <div class="pgrid" id="pgrid"></div>
+  </div>
+</main>
+</div>
+
+<!-- HOVER TIP -->
+<div id="tip"></div>
+
+<!-- GROUP MODAL -->
+<div class="g-overlay" id="g-overlay">
+  <div class="g-modal" id="g-modal">
+    <div class="gm-head" id="gm-head"></div>
+    <div class="gm-tabs" id="gm-tabs"></div>
+    <div class="gm-panels" id="gm-panels"></div>
+  </div>
+</div>
+
+<!-- ELEMENT MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <div class="m-head" id="m-head"></div>
+    <div class="m-tabs" id="m-tabs"></div>
+    <div class="m-panels" id="m-panels"></div>
+    <div class="m-foot" id="m-foot"></div>
+  </div>
+</div>
+
+<script>
+/* ─────────────────── GROUP DATA ─────────────────── */
+const GRP={
+  alkali:{label:'Alkali metals',short:'Alkali metals',bg:'#7a4a10',tx:'#f5c97a',br:'#c07820',
+    desc:'Highly reactive metals with one valence electron. React vigorously with water, forming hydroxides and releasing hydrogen gas. Reactivity increases down the group.',bond:'Metallic (ionic tendency)'},
+  alkaline:{label:'Alkaline earth',short:'Alkaline earth',bg:'#5a3a08',tx:'#e8b060',br:'#a06418',
+    desc:'Two valence electrons, readily form +2 ions. Less reactive than alkali metals but still strong reducing agents. Harder, denser, and higher melting points.',bond:'Metallic (ionic tendency)'},
+  transition:{label:'Transition metals',short:'Transition metals',bg:'#1a3a5a',tx:'#7ab8e8',br:'#2a5a8a',
+    desc:'d-block metals with variable oxidation states, high melting points, and excellent conductivity. Form coloured compounds and complex ions.',bond:'Metallic bonding'},
+  post_trans:{label:'Post-transition',short:'Post-transition',bg:'#1a3a20',tx:'#78c888',br:'#2a6030',
+    desc:'p-block metals softer than transition metals with lower melting points. Show both metallic and covalent bonding character.',bond:'Metallic (covalent character)'},
+  metalloid:{label:'Metalloids',short:'Metalloids',bg:'#3a2a60',tx:'#a898e8',br:'#5a409a',
+    desc:'Elements with intermediate properties between metals and nonmetals. Key semiconductors with covalent network structures.',bond:'Covalent network'},
+  nonmetal:{label:'Nonmetals',short:'Nonmetals',bg:'#1a4a40',tx:'#70d4b8',br:'#1a7060',
+    desc:'Form covalent molecular bonds. Poor conductors, low melting points. Include the essential building blocks of life: C, H, N, O, S, P.',bond:'Covalent molecular'},
+  halogen:{label:'Halogens',short:'Halogens',bg:'#4a1a3a',tx:'#d888b8',br:'#7a2860',
+    desc:'One electron short of a full shell. Highly reactive nonmetals forming diatomic molecules and ionic salts with metals.',bond:'Covalent molecular'},
+  noble:{label:'Noble gases',short:'Noble gases',bg:'#2e2e32',tx:'#a8a8bc',br:'#505068',
+    desc:'Completely filled valence shells making them chemically inert under standard conditions. Monatomic gases with only weak London dispersion forces.',bond:'Noble gas / atomic'},
+  lanthanide:{label:'Lanthanides',short:'Lanthanides',bg:'#1a2a4a',tx:'#80a8d8',br:'#2a4070',
+    desc:'4f-block rare earth metals with very similar chemical properties due to lanthanide contraction. Essential in modern technology.',bond:'Metallic (4f electrons)'},
+  actinide:{label:'Actinides',short:'Actinides',bg:'#2a1a4a',tx:'#a888d0',br:'#4a2a78',
+    desc:'5f-block elements, all radioactive. Include naturally occurring and synthetic elements with complex multi-valent chemistry.',bond:'Metallic (5f electrons)'},
+};
+
+/* ─────────────────── EXTENDED ELEMENT DATA ─────────────────── */
+const EDATA={
+  1:{shells:[1],en:2.20,mp:13.99,bp:20.27,dens:0.00009,yr:1766,who:'Henry Cavendish',where:'England',valence:1,ox:'+1, −1',crystal:'Hexagonal',phase:'Gas',cat:'Diatomic nonmetal',abund:1400,
+    uses:['Fuel cells','Hydrogenation','Rocket fuel','Petroleum refining','Ammonia synthesis'],
+    fact:'Hydrogen makes up <b>75% of all normal matter</b> in the universe by mass. It is the lightest and most abundant element.',
+    isotopes:[{sym:'¹H',name:'Protium',stable:true},{sym:'²H',name:'Deuterium',stable:true},{sym:'³H',name:'Tritium',stable:false}],
+    reactivity:{water:9,acid:8,oxygen:7,metals:2},
+    quiz:[
+      {q:'What is the atomic number of Hydrogen?',opts:['1','2','3','8'],ans:0,exp:'Hydrogen has atomic number 1 — it is the first element on the periodic table.'},
+      {q:'Which block of the periodic table does Hydrogen belong to?',opts:['s-block','p-block','d-block','f-block'],ans:0,exp:'Hydrogen is in the s-block (1s¹ configuration), though it has unique properties unlike any group.'},
+      {q:'What is the standard state of Hydrogen at room temperature?',opts:['Solid','Liquid','Gas','Plasma'],ans:2,exp:'Hydrogen (H₂) is a colourless, odourless diatomic gas at standard temperature and pressure.'},
+      {q:'Which oxidation states can Hydrogen exhibit?',opts:['+1 only','−1 only','+1 and −1','0 only'],ans:2,exp:'Hydrogen can be +1 (in acids/water) or −1 (in metal hydrides like NaH), making it unique.'},
+      {q:'What is the approximate electronegativity of Hydrogen on the Pauling scale?',opts:['1.00','2.20','3.44','0.98'],ans:1,exp:'Hydrogen has an electronegativity of 2.20 — intermediate, which is why it bonds with both metals and nonmetals.'},
+    ]
+  },
+  2:{shells:[2],en:'—',mp:0.95,bp:4.22,dens:0.000164,yr:1868,who:'Janssen & Lockyer',where:'France / UK',valence:0,ox:'0',crystal:'HCP',phase:'Gas',cat:'Noble gas',abund:0.008,
+    uses:['MRI cooling','Party balloons','Deep-sea diving (heliox)','Arc welding shielding','Superconductor cooling'],
+    fact:'Helium was <b>discovered in the Sun before Earth</b> — spectral lines in sunlight in 1868, 27 years before it was found in terrestrial minerals.',
+    isotopes:[{sym:'³He',name:'Helium-3',stable:true},{sym:'⁴He',name:'Helium-4',stable:true}],
+    reactivity:{water:0,acid:0,oxygen:0,metals:0},
+    quiz:[
+      {q:'Helium was first discovered in which object?',opts:['Earth\'s crust','The Sun','The Moon','Mars'],ans:1,exp:'Helium was identified from the spectral lines of sunlight during the 1868 solar eclipse — its name comes from Helios, the Greek sun god.'},
+      {q:'How many electrons are in a neutral Helium atom?',opts:['1','2','4','8'],ans:1,exp:'Helium has atomic number 2, meaning 2 protons and 2 electrons filling the 1s shell completely.'},
+      {q:'Why is Helium used in deep-sea diving mixtures instead of nitrogen?',opts:['It is cheaper','It does not cause narcosis at depth','It is heavier','It reacts with water'],ans:1,exp:'Nitrogen causes nitrogen narcosis at depth. Helium does not — making heliox (He+O₂) safer for deep dives.'},
+      {q:'What is the boiling point of Helium (the lowest of all elements)?',opts:['4.22 K','77 K','195 K','273 K'],ans:0,exp:'Helium boils at just 4.22 K (−269°C), the lowest boiling point of any element — essential for superconductor cooling.'},
+      {q:'Helium belongs to which group of the periodic table?',opts:['Group 1','Group 2','Group 17','Group 18'],ans:3,exp:'Helium is in Group 18 — the noble gases — due to its complete outer electron shell (1s²).'},
+    ]
+  },
+  6:{shells:[2,4],en:2.55,mp:3915,bp:3915,dens:2.267,yr:'Ancient',who:'Known since antiquity',where:'—',valence:4,ox:'+4, +2, −4',crystal:'Diamond cubic / Hexagonal',phase:'Solid',cat:'Polyatomic nonmetal',abund:200,
+    uses:['Steel alloys','Plastics & polymers','Fuels','Pharmaceuticals','Carbon fibre composites'],
+    fact:'Carbon forms <b>over 10 million known compounds</b> — more than all other elements combined. It is the chemical basis of all known life on Earth.',
+    isotopes:[{sym:'¹²C',name:'Carbon-12',stable:true},{sym:'¹³C',name:'Carbon-13',stable:true},{sym:'¹⁴C',name:'Carbon-14',stable:false}],
+    reactivity:{water:1,acid:3,oxygen:8,metals:5},
+    quiz:[
+      {q:'What is the hardest naturally occurring substance made from Carbon?',opts:['Graphite','Graphene','Diamond','Fullerene'],ans:2,exp:'Diamond is the hardest natural substance — each carbon atom is covalently bonded to 4 others in a 3D tetrahedral lattice.'},
+      {q:'Which carbon isotope is used in radiocarbon dating?',opts:['¹²C','¹³C','¹⁴C','¹¹C'],ans:2,exp:'Carbon-14 is radioactive with a half-life of ~5730 years, making it perfect for dating organic material up to ~50,000 years old.'},
+      {q:'What is the hybridisation of carbon in diamond?',opts:['sp','sp²','sp³','sp³d'],ans:2,exp:'In diamond, each carbon has sp³ hybridisation, forming 4 equivalent tetrahedral covalent bonds — giving diamond its exceptional hardness.'},
+      {q:'How many known organic compounds contain carbon?',opts:['~1,000','~100,000','~1 million','Over 10 million'],ans:3,exp:'Over 10 million carbon-containing compounds are known, vastly outnumbering compounds of any other element.'},
+      {q:'Carbon\'s electronegativity on the Pauling scale is:',opts:['1.55','2.55','3.44','3.98'],ans:1,exp:'Carbon has an electronegativity of 2.55 — intermediate — allowing it to form bonds with almost every other element.'},
+    ]
+  },
+  7:{shells:[2,5],en:3.04,mp:63.15,bp:77.36,dens:0.00125,yr:1772,who:'Daniel Rutherford',where:'Scotland',valence:3,ox:'+5, +3, +2, −3',crystal:'Hexagonal',phase:'Gas',cat:'Diatomic nonmetal',abund:19,
+    uses:['Haber process (fertilisers)','Explosives & propellants','Nylon production','Dye industry','Liquid nitrogen refrigeration'],
+    fact:'Despite making up <b>78% of Earth\'s atmosphere</b>, molecular N₂ is almost completely inert due to its extremely strong triple bond (941 kJ/mol).',
+    isotopes:[{sym:'¹⁴N',name:'Nitrogen-14',stable:true},{sym:'¹⁵N',name:'Nitrogen-15',stable:true}],
+    reactivity:{water:1,acid:2,oxygen:3,metals:4},
+    quiz:[
+      {q:'What percentage of Earth\'s atmosphere is Nitrogen?',opts:['21%','55%','78%','90%'],ans:2,exp:'Nitrogen makes up approximately 78.09% of Earth\'s atmosphere by volume, mostly as diatomic N₂.'},
+      {q:'Which industrial process converts atmospheric N₂ into ammonia?',opts:['Ostwald process','Haber-Bosch process','Contact process','Solvay process'],ans:1,exp:'The Haber-Bosch process (N₂ + 3H₂ → 2NH₃) is responsible for producing fertiliser that feeds roughly half of humanity.'},
+      {q:'What type of bond holds the two nitrogen atoms together in N₂?',opts:['Single covalent','Double covalent','Triple covalent','Ionic'],ans:2,exp:'N≡N has a triple bond — one sigma and two pi bonds — with a bond energy of 941 kJ/mol, making it extremely stable.'},
+      {q:'Nitrogen was discovered in 1772 by:',opts:['Antoine Lavoisier','Carl Scheele','Daniel Rutherford','Joseph Priestley'],ans:2,exp:'Daniel Rutherford identified nitrogen in 1772 by removing oxygen and CO₂ from air and noting what remained was non-supportive of combustion.'},
+      {q:'At what temperature does nitrogen become liquid (its boiling point)?',opts:['77 K','90 K','195 K','273 K'],ans:0,exp:'Liquid nitrogen boils at 77 K (−196°C) at atmospheric pressure, making it widely used as a low-cost cryogenic fluid.'},
+    ]
+  },
+  8:{shells:[2,6],en:3.44,mp:54.36,bp:90.20,dens:0.00143,yr:1771,who:'Carl Wilhelm Scheele',where:'Sweden',valence:2,ox:'−2, −1, +2',crystal:'Cubic',phase:'Gas',cat:'Diatomic nonmetal',abund:461000,
+    uses:['Combustion / respiration','Steel & iron production','Water treatment','Rocket oxidiser','Medical breathing apparatus'],
+    fact:'<b>Liquid oxygen is pale blue</b> and is paramagnetic — it is visibly attracted to a magnet. Oxygen is the most abundant element in Earth\'s crust by mass.',
+    isotopes:[{sym:'¹⁶O',name:'Oxygen-16',stable:true},{sym:'¹⁷O',name:'Oxygen-17',stable:true},{sym:'¹⁸O',name:'Oxygen-18',stable:true}],
+    reactivity:{water:2,acid:3,oxygen:10,metals:7},
+    quiz:[
+      {q:'Oxygen was independently discovered in 1771-1774. Which scientist is most often credited?',opts:['Lavoisier','Scheele','Priestley','Davy'],ans:2,exp:'Joseph Priestley isolated oxygen in 1774 and published first. Scheele discovered it earlier (~1771) but published later. Lavoisier named it.'},
+      {q:'What percentage of Earth\'s crust by mass is Oxygen?',opts:['21%','30%','46%','60%'],ans:2,exp:'Oxygen makes up about 46% of Earth\'s crust by mass — mostly locked in silicate and oxide minerals, not as free O₂.'},
+      {q:'What is the standard state of oxygen in the atmosphere?',opts:['O (atomic)','O₂ (diatomic)','O₃ (triatomic)','O₄'],ans:1,exp:'Atmospheric oxygen exists as O₂ — a diatomic molecule. O₃ (ozone) also exists naturally but in much smaller amounts.'},
+      {q:'Liquid oxygen is:',opts:['Colourless and diamagnetic','Blue and paramagnetic','Red and diamagnetic','Clear and non-magnetic'],ans:1,exp:'Liquid oxygen has a characteristic pale blue colour and is paramagnetic — two unpaired electrons in its molecular orbitals make it attracted to magnets.'},
+      {q:'What is the electronegativity of Oxygen on the Pauling scale?',opts:['2.20','3.04','3.44','3.98'],ans:2,exp:'Oxygen has electronegativity of 3.44 — second only to Fluorine (3.98), making it one of the strongest electron attractors.'},
+    ]
+  },
+  11:{shells:[2,8,1],en:0.93,mp:370.95,bp:1156,dens:0.97,yr:1807,who:'Humphry Davy',where:'England',valence:1,ox:'+1',crystal:'BCC',phase:'Solid',cat:'Alkali metal',abund:23600,
+    uses:['Table salt (NaCl)','Soap manufacture','Glass production','Sodium-vapour street lamps','Nerve impulse transmission'],
+    fact:'Sodium burns with a <b>bright characteristic yellow flame</b> — the same colour as sodium street lights. It reacts so violently with water it can ignite hydrogen gas.',
+    isotopes:[{sym:'²³Na',name:'Sodium-23',stable:true},{sym:'²²Na',name:'Sodium-22',stable:false}],
+    reactivity:{water:8,acid:9,oxygen:8,metals:1},
+    quiz:[
+      {q:'What is the common name for Sodium Chloride (NaCl)?',opts:['Baking soda','Table salt','Epsom salt','Limestone'],ans:1,exp:'NaCl — sodium chloride — is ordinary table salt, one of the most essential compounds for human biology and food preservation.'},
+      {q:'Sodium was first isolated in 1807 by:',opts:['Lavoisier','Davy','Berzelius','Gay-Lussac'],ans:1,exp:'Humphry Davy isolated sodium in 1807 by electrolyzing molten sodium hydroxide — the first isolation of an alkali metal.'},
+      {q:'What colour flame does Sodium produce in a flame test?',opts:['Red','Lilac/violet','Bright yellow','Blue-green'],ans:2,exp:'Sodium produces a distinctive bright yellow/orange flame due to the emission spectrum of its 3s→3p electron transition at 589 nm.'},
+      {q:'Which crystal structure does solid Sodium adopt?',opts:['FCC','HCP','BCC','Diamond cubic'],ans:2,exp:'Sodium adopts a Body-Centred Cubic (BCC) structure — common among alkali metals due to their single valence electron.'},
+      {q:'What is the reaction of Sodium with water?',opts:['No reaction','Slow dissolving','Vigorous reaction producing NaOH and H₂','Explosion only'],ans:2,exp:'2Na + 2H₂O → 2NaOH + H₂↑ — sodium reacts vigorously with water, producing sodium hydroxide and flammable hydrogen gas.'},
+    ]
+  },
+  26:{shells:[2,8,14,2],en:1.83,mp:1811,bp:3134,dens:7.87,yr:'Ancient',who:'Known since antiquity',where:'—',valence:2,ox:'+3, +2',crystal:'BCC',phase:'Solid',cat:'Transition metal',abund:56300,
+    uses:['Steel & cast iron','Permanent magnets','Haemoglobin in blood','Catalysts (Haber process)','Construction & engineering'],
+    fact:'Iron is the <b>most abundant element by mass in the entire Earth</b> — Earth\'s core is predominantly molten iron-nickel. The red colour of Mars is iron oxide (rust).',
+    isotopes:[{sym:'⁵⁴Fe',name:'Iron-54',stable:true},{sym:'⁵⁶Fe',name:'Iron-56',stable:true},{sym:'⁵⁷Fe',name:'Iron-57',stable:true},{sym:'⁵⁸Fe',name:'Iron-58',stable:true}],
+    reactivity:{water:3,acid:7,oxygen:6,metals:4},
+    quiz:[
+      {q:'What is the most common oxidation state of Iron in rust (Fe₂O₃)?',opts:['+1','+2','+3','+4'],ans:2,exp:'Iron(III) oxide (Fe₂O₃) contains Fe³⁺ ions — iron in its +3 oxidation state, produced by oxidation in the presence of water and oxygen.'},
+      {q:'Iron is the most abundant element by mass in:',opts:['Earth\'s atmosphere','Earth\'s oceans','Earth as a whole','Earth\'s crust'],ans:2,exp:'By total mass of Earth, iron is the most abundant element (~32%) — most of it in the liquid outer core and solid inner core.'},
+      {q:'What is the Curie temperature of Iron (above which it loses ferromagnetism)?',opts:['500°C','768°C','1000°C','1538°C'],ans:1,exp:'Iron loses its ferromagnetism above 768°C (the Curie point) — above this temperature, thermal energy disrupts magnetic domain alignment.'},
+      {q:'Which alloy of iron is produced by adding ~0.1–2% carbon?',opts:['Cast iron','Steel','Wrought iron','Pig iron'],ans:1,exp:'Steel is an iron-carbon alloy with 0.1–2% carbon content. Different carbon levels give different grades of steel with varying hardness.'},
+      {q:'Iron is essential in the human body primarily because it:',opts:['Strengthens bones','Carries oxygen in haemoglobin','Conducts nerve signals','Regulates blood sugar'],ans:1,exp:'Iron is at the centre of the haem group in haemoglobin — it binds O₂ in the lungs and releases it in tissues. Iron deficiency causes anaemia.'},
+    ]
+  },
+  79:{shells:[2,8,18,32,18,1],en:2.54,mp:1337.33,bp:3129,dens:19.30,yr:'Ancient',who:'Known since antiquity',where:'—',valence:1,ox:'+3, +1',crystal:'FCC',phase:'Solid',cat:'Transition metal',abund:0.004,
+    uses:['Jewellery & coinage','Electronics (connectors)','Dentistry','Financial reserves','Catalytic converters'],
+    fact:'All gold ever mined in human history would fit into a <b>21-metre cube</b>. A single gram of gold can be beaten into a sheet of 1 square metre (gold leaf).',
+    isotopes:[{sym:'¹⁹⁷Au',name:'Gold-197',stable:true}],
+    reactivity:{water:0,acid:1,oxygen:0,metals:0},
+    quiz:[
+      {q:'Gold has only one stable isotope. What is it?',opts:['¹⁹⁵Au','¹⁹⁶Au','¹⁹⁷Au','¹⁹⁸Au'],ans:2,exp:'Gold-197 (¹⁹⁷Au) is the only stable isotope of gold — making it monoisotopic and giving it a precise atomic mass of 196.967 u.'},
+      {q:'What is the chemical symbol Au derived from?',opts:['Arabic: Aur','Latin: Aurum','Greek: Auros','Old English: Golde'],ans:1,exp:'Au comes from the Latin word "Aurum" meaning gold — used in Roman metallurgy and retained in modern chemical nomenclature.'},
+      {q:'Gold is considered "noble" because it:',opts:['Is very shiny','Resists corrosion and most chemical reactions','Is the most expensive metal','Is very heavy'],ans:1,exp:'Gold is a noble metal because it is highly resistant to oxidation and chemical attack. It does not react with oxygen, water, or most acids.'},
+      {q:'Which mixture of acids dissolves Gold?',opts:['Hydrochloric acid alone','Sulfuric acid alone','Aqua regia (HCl + HNO₃)','Hydrofluoric acid'],ans:2,exp:'Aqua regia ("royal water") — a 3:1 mixture of HCl and HNO₃ — is one of the few reagents that can dissolve gold.'},
+      {q:'Gold\'s atomic number is:',opts:['74','78','79','80'],ans:2,exp:'Gold has atomic number 79 — 79 protons in its nucleus — placing it in Period 6 of the periodic table.'},
+    ]
+  },
+};
+
+function getED(z){
+  const d=EDATA[z];
+  if(d) return d;
+  const el=ELS.find(e=>e[0]===z);
+  const g=el?GRP[el[4]]:null;
+  return {
+    shells:['?'],en:'—',mp:'—',bp:'—',dens:'—',yr:'—',who:'—',where:'—',
+    valence:'—',ox:'Various',crystal:'—',phase:'Solid',cat:g?g.label:'—',abund:'Trace',
+    uses:['Industrial applications','Research purposes'],
+    fact:`<b>${el?el[2]:'This element'}</b> is a ${g?g.label.toLowerCase():'element'} with ${g?g.bond.toLowerCase():''} bonding. Full extended data for this element is not yet included in this dataset.`,
+    isotopes:[],reactivity:{water:3,acid:3,oxygen:3,metals:3},
+    quiz:[
+      {q:`What group does ${el?el[2]:'this element'} belong to?`,opts:[g?g.label:'Unknown','Alkali metals','Noble gases','Halogens'],ans:0,exp:`${el?el[2]:'This element'} belongs to the ${g?g.label:'—'} group.`},
+      {q:`What is the atomic number of ${el?el[2]:'this element'}?`,opts:[String(z),String(z+2),String(z-1),String(z+5)],ans:0,exp:`The atomic number is ${z} — this is the number of protons in the nucleus.`},
+      {q:`What bonding type is typical for ${g?g.label:'this group'}?`,opts:[g?g.bond:'Metallic','Covalent molecular','Noble gas','Ionic only'],ans:0,exp:g?g.desc:'This element belongs to a group with specific bonding characteristics.'},
+    ]
+  };
+}
+
+/* ─────────────────── ELEMENT ARRAY ─────────────────── */
+const ELS=[
+  [1,'H','Hydrogen',1.008,'nonmetal',1,1],[2,'He','Helium',4.003,'noble',1,18],
+  [3,'Li','Lithium',6.941,'alkali',2,1],[4,'Be','Beryllium',9.012,'alkaline',2,2],
+  [5,'B','Boron',10.811,'metalloid',2,13],[6,'C','Carbon',12.011,'nonmetal',2,14],
+  [7,'N','Nitrogen',14.007,'nonmetal',2,15],[8,'O','Oxygen',15.999,'nonmetal',2,16],
+  [9,'F','Fluorine',18.998,'halogen',2,17],[10,'Ne','Neon',20.180,'noble',2,18],
+  [11,'Na','Sodium',22.990,'alkali',3,1],[12,'Mg','Magnesium',24.305,'alkaline',3,2],
+  [13,'Al','Aluminum',26.982,'post_trans',3,13],[14,'Si','Silicon',28.086,'metalloid',3,14],
+  [15,'P','Phosphorus',30.974,'nonmetal',3,15],[16,'S','Sulfur',32.065,'nonmetal',3,16],
+  [17,'Cl','Chlorine',35.453,'halogen',3,17],[18,'Ar','Argon',39.948,'noble',3,18],
+  [19,'K','Potassium',39.098,'alkali',4,1],[20,'Ca','Calcium',40.078,'alkaline',4,2],
+  [21,'Sc','Scandium',44.956,'transition',4,3],[22,'Ti','Titanium',47.867,'transition',4,4],
+  [23,'V','Vanadium',50.942,'transition',4,5],[24,'Cr','Chromium',51.996,'transition',4,6],
+  [25,'Mn','Manganese',54.938,'transition',4,7],[26,'Fe','Iron',55.845,'transition',4,8],
+  [27,'Co','Cobalt',58.933,'transition',4,9],[28,'Ni','Nickel',58.693,'transition',4,10],
+  [29,'Cu','Copper',63.546,'transition',4,11],[30,'Zn','Zinc',65.380,'transition',4,12],
+  [31,'Ga','Gallium',69.723,'post_trans',4,13],[32,'Ge','Germanium',72.631,'metalloid',4,14],
+  [33,'As','Arsenic',74.922,'metalloid',4,15],[34,'Se','Selenium',78.971,'nonmetal',4,16],
+  [35,'Br','Bromine',79.904,'halogen',4,17],[36,'Kr','Krypton',83.798,'noble',4,18],
+  [37,'Rb','Rubidium',85.468,'alkali',5,1],[38,'Sr','Strontium',87.620,'alkaline',5,2],
+  [39,'Y','Yttrium',88.906,'transition',5,3],[40,'Zr','Zirconium',91.224,'transition',5,4],
+  [41,'Nb','Niobium',92.906,'transition',5,5],[42,'Mo','Molybdenum',95.950,'transition',5,6],
+  [43,'Tc','Technetium',98,'transition',5,7],[44,'Ru','Ruthenium',101.07,'transition',5,8],
+  [45,'Rh','Rhodium',102.906,'transition',5,9],[46,'Pd','Palladium',106.42,'transition',5,10],
+  [47,'Ag','Silver',107.868,'transition',5,11],[48,'Cd','Cadmium',112.414,'transition',5,12],
+  [49,'In','Indium',114.818,'post_trans',5,13],[50,'Sn','Tin',118.711,'post_trans',5,14],
+  [51,'Sb','Antimony',121.760,'metalloid',5,15],[52,'Te','Tellurium',127.600,'metalloid',5,16],
+  [53,'I','Iodine',126.904,'halogen',5,17],[54,'Xe','Xenon',131.293,'noble',5,18],
+  [55,'Cs','Cesium',132.905,'alkali',6,1],[56,'Ba','Barium',137.327,'alkaline',6,2],
+  [57,'La','Lanthanum',138.905,'lanthanide',6,3],
+  [72,'Hf','Hafnium',178.49,'transition',6,4],[73,'Ta','Tantalum',180.948,'transition',6,5],
+  [74,'W','Tungsten',183.84,'transition',6,6],[75,'Re','Rhenium',186.207,'transition',6,7],
+  [76,'Os','Osmium',190.23,'transition',6,8],[77,'Ir','Iridium',192.217,'transition',6,9],
+  [78,'Pt','Platinum',195.085,'transition',6,10],[79,'Au','Gold',196.967,'transition',6,11],
+  [80,'Hg','Mercury',200.592,'transition',6,12],[81,'Tl','Thallium',204.383,'post_trans',6,13],
+  [82,'Pb','Lead',207.2,'post_trans',6,14],[83,'Bi','Bismuth',208.98,'post_trans',6,15],
+  [84,'Po','Polonium',209,'post_trans',6,16],[85,'At','Astatine',210,'halogen',6,17],
+  [86,'Rn','Radon',222,'noble',6,18],[87,'Fr','Francium',223,'alkali',7,1],
+  [88,'Ra','Radium',226,'alkaline',7,2],[89,'Ac','Actinium',227,'actinide',7,3],
+  [104,'Rf','Rutherfordium',267,'transition',7,4],[105,'Db','Dubnium',268,'transition',7,5],
+  [106,'Sg','Seaborgium',271,'transition',7,6],[107,'Bh','Bohrium',274,'transition',7,7],
+  [108,'Hs','Hassium',277,'transition',7,8],[109,'Mt','Meitnerium',278,'transition',7,9],
+  [110,'Ds','Darmstadtium',281,'transition',7,10],[111,'Rg','Roentgenium',282,'transition',7,11],
+  [112,'Cn','Copernicium',285,'transition',7,12],[113,'Nh','Nihonium',286,'post_trans',7,13],
+  [114,'Fl','Flerovium',289,'post_trans',7,14],[115,'Mc','Moscovium',290,'post_trans',7,15],
+  [116,'Lv','Livermorium',293,'post_trans',7,16],[117,'Ts','Tennessine',294,'halogen',7,17],
+  [118,'Og','Oganesson',294,'noble',7,18],
+  [58,'Ce','Cerium',140.116,'lanthanide',9,4],[59,'Pr','Praseodymium',140.908,'lanthanide',9,5],
+  [60,'Nd','Neodymium',144.242,'lanthanide',9,6],[61,'Pm','Promethium',145,'lanthanide',9,7],
+  [62,'Sm','Samarium',150.36,'lanthanide',9,8],[63,'Eu','Europium',151.964,'lanthanide',9,9],
+  [64,'Gd','Gadolinium',157.25,'lanthanide',9,10],[65,'Tb','Terbium',158.925,'lanthanide',9,11],
+  [66,'Dy','Dysprosium',162.5,'lanthanide',9,12],[67,'Ho','Holmium',164.93,'lanthanide',9,13],
+  [68,'Er','Erbium',167.259,'lanthanide',9,14],[69,'Tm','Thulium',168.934,'lanthanide',9,15],
+  [70,'Yb','Ytterbium',173.055,'lanthanide',9,16],[71,'Lu','Lutetium',174.967,'lanthanide',9,17],
+  [90,'Th','Thorium',232.038,'actinide',10,4],[91,'Pa','Protactinium',231.036,'actinide',10,5],
+  [92,'U','Uranium',238.029,'actinide',10,6],[93,'Np','Neptunium',237,'actinide',10,7],
+  [94,'Pu','Plutonium',244,'actinide',10,8],[95,'Am','Americium',243,'actinide',10,9],
+  [96,'Cm','Curium',247,'actinide',10,10],[97,'Bk','Berkelium',247,'actinide',10,11],
+  [98,'Cf','Californium',251,'actinide',10,12],[99,'Es','Einsteinium',252,'actinide',10,13],
+  [100,'Fm','Fermium',257,'actinide',10,14],[101,'Md','Mendelevium',258,'actinide',10,15],
+  [102,'No','Nobelium',259,'actinide',10,16],[103,'Lr','Lawrencium',266,'actinide',10,17],
+];
+
+const STATES={H:'Gas',He:'Gas',N:'Gas',O:'Gas',F:'Gas',Ne:'Gas',Cl:'Gas',Ar:'Gas',Kr:'Gas',Xe:'Gas',Rn:'Gas',Br:'Liquid',Hg:'Liquid'};
+const stOf=s=>STATES[s]||'Solid';
+
+let activeF='all', hlZ=null;
+
+/* ═══ GROUP EXTENDED DATA ═══ */
+const GRPX={
+  alkali:{
+    icon:'⚡',block:'s',periods:'2–7',valence_e:1,charge:'+1',
+    melting:'Low (Li 454K → Cs 302K)',density:'Very low (0.5–1.9 g/cm³)',
+    electronegativity:'Very low (0.7–1.0 Pauling)',hardness:'Soft — cuttable with a knife',
+    color_flame:{Li:'Crimson red',Na:'Bright yellow',K:'Lilac/violet',Rb:'Red-violet',Cs:'Blue',Fr:'Unknown'},
+    trend_reactivity:85,trend_melting:15,trend_density:20,trend_en:12,
+    facts:[
+      '<b>All alkali metals are stored under oil</b> to prevent reaction with atmospheric oxygen and moisture.',
+      '<b>Lithium is used in rechargeable batteries</b> — nearly every smartphone, laptop, and electric vehicle uses Li-ion cells.',
+      '<b>Sodium is essential for nerve function</b> — the sodium-potassium pump maintains electrical potential across cell membranes.',
+      '<b>Reactivity increases dramatically</b> down the group: Li fizzes gently in water, Cs explodes violently on contact.',
+      '<b>Francium is the rarest naturally occurring element</b> — at any given time, less than 30 grams exist in Earth\'s entire crust.',
+      '<b>Caesium atomic clocks</b> define the SI second — accurate to 1 second in 300 million years.',
+    ],
+    comparisons:[
+      [3,'Li','Lithium','BCC','454K','1603K','0.534','+1','0.98'],
+      [11,'Na','Sodium','BCC','371K','1156K','0.97','+1','0.93'],
+      [19,'K','Potassium','BCC','337K','1032K','0.89','+1','0.82'],
+      [37,'Rb','Rubidium','BCC','312K','961K','1.53','+1','0.82'],
+      [55,'Cs','Cesium','BCC','302K','944K','1.93','+1','0.79'],
+      [87,'Fr','Francium','BCC','~300K','~950K','~1.87','+1','0.70'],
+    ],
+    quiz:[
+      {q:'Why are alkali metals stored under oil?',opts:['They dissolve in oil','To prevent reaction with air and moisture','Oil makes them conduct better','They are too hot to touch'],ans:1,exp:'Alkali metals react vigorously with oxygen and water vapour in air. Storing under mineral oil prevents this oxidation.'},
+      {q:'What is the trend in reactivity going down the alkali metal group?',opts:['Decreases','Stays the same','Increases','Alternates'],ans:2,exp:'Reactivity increases down the group as the outermost electron is further from the nucleus and more easily lost, forming +1 ions.'},
+      {q:'Which alkali metal is used in rechargeable batteries?',opts:['Sodium','Potassium','Lithium','Rubidium'],ans:2,exp:'Lithium-ion batteries are the dominant rechargeable technology due to lithium\'s high energy density and low atomic mass.'},
+      {q:'What ion do alkali metals form in chemical reactions?',opts:['+2','+1','-1','0'],ans:1,exp:'Alkali metals have one valence electron which they readily lose, forming stable +1 cations (e.g. Na⁺, K⁺, Li⁺).'},
+      {q:'Which alkali metal produces a bright yellow flame in a flame test?',opts:['Lithium','Potassium','Sodium','Cesium'],ans:2,exp:'Sodium produces a bright yellow/orange flame at 589 nm — the characteristic sodium D-line, used in sodium vapour street lamps.'},
+    ]
+  },
+  alkaline:{
+    icon:'🔩',block:'s',periods:'2–7',valence_e:2,charge:'+2',
+    melting:'Moderate to high (Be 1560K → Ba 1000K)',density:'Low to moderate (1.5–3.6 g/cm³)',
+    electronegativity:'Low (0.9–1.6 Pauling)',hardness:'Harder than alkali metals',
+    color_flame:{Be:'White',Mg:'White',Ca:'Orange-red',Sr:'Crimson',Ba:'Apple green',Ra:'Crimson'},
+    trend_reactivity:60,trend_melting:45,trend_density:30,trend_en:22,
+    facts:[
+      '<b>Calcium is the 5th most abundant element in Earth\'s crust</b> and essential for bones, teeth, and cell signalling.',
+      '<b>Magnesium burns with an intensely bright white flame</b> — it cannot be extinguished with water (burns hotter).',
+      '<b>Beryllium is transparent to X-rays</b> — used as windows in X-ray tubes and particle detectors.',
+      '<b>Radium was used in luminous watch dials</b> before its radioactivity was understood — causing the Radium Girls tragedy.',
+      '<b>Barium sulfate is used in X-ray imaging</b> of the digestive tract as a "barium meal" contrast agent.',
+      '<b>Strontium-90</b> is a dangerous fission product — it mimics calcium and deposits in bones, causing radiation damage.',
+    ],
+    comparisons:[
+      [4,'Be','Beryllium','HCP','1560K','2742K','1.85','+2','1.57'],
+      [12,'Mg','Magnesium','HCP','923K','1363K','1.74','+2','1.31'],
+      [20,'Ca','Calcium','FCC','1115K','1757K','1.55','+2','1.00'],
+      [38,'Sr','Strontium','FCC','1050K','1655K','2.64','+2','0.95'],
+      [56,'Ba','Barium','BCC','1000K','2170K','3.51','+2','0.89'],
+      [88,'Ra','Radium','BCC','973K','2010K','~5.0','+2','0.90'],
+    ],
+    quiz:[
+      {q:'What is the common oxidation state of all alkaline earth metals?',opts:['+1','+2','+3','-2'],ans:1,exp:'Alkaline earth metals have 2 valence electrons which they lose to form stable +2 cations (e.g. Mg²⁺, Ca²⁺).'},
+      {q:'Which alkaline earth metal is essential for strong bones and teeth?',opts:['Beryllium','Magnesium','Calcium','Barium'],ans:2,exp:'Calcium (as Ca²⁺) is the main mineral in bones (hydroxyapatite) and teeth, and is essential for muscle contraction and nerve signals.'},
+      {q:'Why can\'t magnesium fires be extinguished with water?',opts:['Water is absorbed by Mg','Mg reacts with water producing flammable H₂ gas','Water freezes on contact','Mg floats on water'],ans:1,exp:'Mg + 2H₂O → Mg(OH)₂ + H₂↑ — magnesium reacts with water producing hydrogen gas which feeds the fire.'},
+      {q:'Which alkaline earth metal produces a green flame in flame tests?',opts:['Calcium','Strontium','Barium','Magnesium'],ans:2,exp:'Barium produces a characteristic apple-green flame — used to identify barium compounds in qualitative analysis.'},
+      {q:'What is the trend in reactivity going down the alkaline earth group?',opts:['Decreases','Stays constant','Increases','No clear trend'],ans:2,exp:'Reactivity increases down the group — outer electrons are further from the nucleus, easier to remove, and the elements become stronger reducing agents.'},
+    ]
+  },
+  transition:{
+    icon:'⚙',block:'d',periods:'4–7',valence_e:'1–2 (d electrons variable)',charge:'Variable (+1 to +7)',
+    melting:'Very high (Ti 1941K → W 3695K)',density:'High (4.5–22.6 g/cm³)',
+    electronegativity:'Moderate (1.3–2.5 Pauling)',hardness:'Generally hard and strong',
+    color_flame:{Fe:'Gold',Cu:'Blue-green',Ni:'—',Cr:'—',Mn:'—',Co:'—'},
+    trend_reactivity:45,trend_melting:80,trend_density:75,trend_en:55,
+    facts:[
+      '<b>Transition metals can form multiple oxidation states</b> because both 4s and 3d electrons can be involved in bonding.',
+      '<b>Many transition metal compounds are coloured</b> due to d-d electron transitions absorbing visible light.',
+      '<b>Tungsten has the highest melting point</b> of all elements (3695 K) — used in light bulb filaments and cutting tools.',
+      '<b>Iron is the most abundant transition metal</b> in Earth\'s crust and the most widely used metal in industry.',
+      '<b>Platinum and palladium are catalysts</b> in catalytic converters, breaking down toxic exhaust gases.',
+      '<b>Gold and silver are "noble" transition metals</b> — highly resistant to corrosion due to filled d-orbitals.',
+    ],
+    comparisons:[
+      [22,'Ti','Titanium','HCP','1941K','3560K','4.51','+4,+3',  '1.54'],
+      [24,'Cr','Chromium','BCC','2180K','2944K','7.15','+3,+6',  '1.66'],
+      [26,'Fe','Iron','BCC','1811K','3134K','7.87','+2,+3',     '1.83'],
+      [28,'Ni','Nickel','FCC','1728K','3186K','8.91','+2,+3',   '1.91'],
+      [29,'Cu','Copper','FCC','1358K','2835K','8.96','+1,+2',   '1.90'],
+      [74,'W','Tungsten','BCC','3695K','5828K','19.3','+6,+4',  '2.36'],
+    ],
+    quiz:[
+      {q:'Why do transition metals have variable oxidation states?',opts:['They have no electrons','Both s and d electrons can be lost','They are all radioactive','Their electrons are fixed'],ans:1,exp:'Transition metals can lose both their 4s electrons and varying numbers of 3d electrons, giving them multiple stable oxidation states.'},
+      {q:'Which transition metal has the highest melting point of all elements?',opts:['Iron','Platinum','Tungsten','Osmium'],ans:2,exp:'Tungsten (W) has the highest melting point of any element at 3695 K (3422°C), making it ideal for high-temperature applications.'},
+      {q:'Why are many transition metal compounds coloured?',opts:['They reflect all light','d-d electron transitions absorb visible light','They are transparent','They emit light spontaneously'],ans:1,exp:'Partially filled d-orbitals allow d-d transitions — electrons absorbing specific wavelengths of visible light, making the transmitted light coloured.'},
+      {q:'Which transition metal is used in catalytic converters?',opts:['Iron','Copper','Platinum/Palladium','Gold'],ans:2,exp:'Platinum and palladium catalyse the conversion of CO, NOx, and unburnt hydrocarbons into CO₂, N₂, and water in car exhausts.'},
+      {q:'What is the densest transition metal (and densest element overall)?',opts:['Gold','Tungsten','Osmium','Iridium'],ans:2,exp:'Osmium is the densest known element at 22.59 g/cm³, edging out iridium (22.56 g/cm³). Both are far denser than gold (19.3 g/cm³).'},
+    ]
+  },
+  post_trans:{
+    icon:'🔧',block:'p',periods:'2–7',valence_e:'3–6 (p-block)',charge:'+1 to +4 typical',
+    melting:'Low to moderate (Ga 303K → Bi 545K)',density:'Moderate to high (2.7–13.5 g/cm³)',
+    electronegativity:'Moderate (1.6–2.0 Pauling)',hardness:'Soft to moderate, malleable',
+    color_flame:{'Al':'Silver-white','Sn':'—','Pb':'Blue-white','Bi':'—','Ga':'—','In':'Indigo-blue'},
+    trend_reactivity:30,trend_melting:28,trend_density:55,trend_en:40,
+    facts:[
+      '<b>Aluminium is the most abundant metal in Earth\'s crust</b> — it was once more valuable than gold before electrolysis made it cheap.',
+      '<b>Gallium melts in your hand</b> — its melting point is just 29.8°C (302.9 K), slightly above room temperature.',
+      '<b>Lead was used in Roman plumbing</b> — the word "plumbing" comes from "plumbum," the Latin name for lead.',
+      '<b>Bismuth is slightly radioactive</b> — all its isotopes undergo alpha decay, but with half-lives longer than the age of the universe.',
+      '<b>Tin pest</b> — below 13°C, white tin slowly converts to grey tin (powdery) — this destroyed Napoleon\'s army\'s button tin in Russian winter.',
+      '<b>Indium is essential in touchscreens</b> — ITO (indium tin oxide) forms the transparent conductive layer in LCD and touchscreen displays.',
+    ],
+    comparisons:[
+      [13,'Al','Aluminum','FCC','933K','2743K','2.70','+3','1.61'],
+      [31,'Ga','Gallium','Orth','303K','2477K','5.91','+3','1.81'],
+      [49,'In','Indium','Tetr','430K','2345K','7.31','+3','1.78'],
+      [50,'Sn','Tin','Tetr','505K','2875K','7.29','+4,+2','1.96'],
+      [82,'Pb','Lead','FCC','600K','2022K','11.3','+4,+2','2.33'],
+      [83,'Bi','Bismuth','Rhom','545K','1837K','9.79','+3','2.02'],
+    ],
+    quiz:[
+      {q:'Which post-transition metal melts at just 29.8°C (in your hand)?',opts:['Aluminium','Indium','Gallium','Tin'],ans:2,exp:'Gallium has a melting point of 302.9 K (29.8°C) — just above room temperature — so it melts when held in a warm hand.'},
+      {q:'Aluminium was once more valuable than gold because:',opts:['It is very rare','Extraction was extremely difficult before electrolysis','It is heavier','It does not tarnish'],ans:1,exp:'Before the Hall-Héroult electrolysis process (1886), aluminium was incredibly hard to extract. Napoleon III served it only to his most honoured guests.'},
+      {q:'What is "tin pest" and when does it occur?',opts:['Tin corroding in acid','Tin converting to powdery grey form below 13°C','Tin melting unexpectedly','Tin reacting with water'],ans:1,exp:'Below 13°C, white tin (β-Sn) slowly transforms into grey tin (α-Sn) — a powdery, brittle allotrope. This destroyed tin buttons and organ pipes in cold climates.'},
+      {q:'What critical technology relies on Indium (as ITO)?',opts:['Solar panels only','Nuclear reactors','Touchscreens and LCD displays','Jet engines'],ans:2,exp:'Indium Tin Oxide (ITO) is a transparent electrical conductor used in virtually all touchscreens and LCD displays as the sensing/electrode layer.'},
+      {q:'Lead\'s chemical symbol Pb comes from:',opts:['English "Lead"','Latin "Plumbum"','German "Blei"','Greek "Plumbos"'],ans:1,exp:'"Pb" comes from the Latin "plumbum" — which also gave us the word "plumbing" since Romans used lead pipes extensively for water supply.'},
+    ]
+  },
+  metalloid:{
+    icon:'💎',block:'p',periods:'2–6',valence_e:'3–6',charge:'+4, +3, or −4 typical',
+    melting:'Moderate to high (varies widely)',density:'Moderate (2.0–6.7 g/cm³)',
+    electronegativity:'Moderate (1.9–2.2 Pauling)',hardness:'Variable — Si very hard, As brittle',
+    color_flame:{B:'Yellow-green','Si':'—','Ge':'—','As':'—','Sb':'—','Te':'—','At':'—'},
+    trend_reactivity:28,trend_melting:55,trend_density:40,trend_en:50,
+    facts:[
+      '<b>Silicon is the foundation of modern computing</b> — every transistor, microchip, and solar cell relies on silicon\'s semiconductor properties.',
+      '<b>Germanium was predicted by Mendeleev</b> before its discovery — he called it "eka-silicon" and accurately predicted its properties.',
+      '<b>Arsenic has been used as a poison for centuries</b> — it was called "inheritance powder" and was undetectable until 19th-century forensics.',
+      '<b>Boron carbide (B₄C) is harder than diamond</b> in some directions and is used in bulletproof armour and nuclear reactor control rods.',
+      '<b>Tellurium gives garlic-like breath</b> — even tiny exposures cause tellurium compounds to be metabolised into telluroethers, exhaled through the lungs.',
+      '<b>Semiconductor doping</b> — adding tiny amounts of metalloids like P or B to silicon creates n-type or p-type materials for transistors.',
+    ],
+    comparisons:[
+      [5,'B','Boron','Rhom','2349K','4200K','2.34','+3','2.04'],
+      [14,'Si','Silicon','Diam','1687K','3538K','2.33','+4,−4','1.90'],
+      [32,'Ge','Germanium','Diam','1211K','3106K','5.32','+4,+2','2.01'],
+      [33,'As','Arsenic','Rhom','1090K','887K','5.73','+5,+3,−3','2.18'],
+      [51,'Sb','Antimony','Rhom','904K','1860K','6.68','+5,+3,−3','2.05'],
+      [52,'Te','Tellurium','Hex','723K','1261K','6.24','+6,+4,−2','2.10'],
+    ],
+    quiz:[
+      {q:'Why is silicon called a semiconductor?',opts:['It only conducts heat','Its conductivity is between metals and insulators, tunable by doping','It is half metal and half plastic','It melts at half the temperature of metals'],ans:1,exp:'Silicon\'s conductivity lies between conductors and insulators. By adding trace dopants (P, B, As), its conductivity can be precisely controlled — the basis of all transistors.'},
+      {q:'Which metalloid did Mendeleev predict before its discovery, calling it "eka-silicon"?',opts:['Boron','Arsenic','Germanium','Tellurium'],ans:2,exp:'Mendeleev\'s 1871 periodic table predicted an unknown element below silicon. Germanium was discovered in 1886 with properties matching his predictions almost exactly.'},
+      {q:'What property defines a metalloid?',opts:['It is magnetic','It has properties intermediate between metals and nonmetals','It has exactly 4 valence electrons','It is always a semiconductor'],ans:1,exp:'Metalloids (semimetals) have properties intermediate between metals and nonmetals — e.g. they may conduct electricity partially, have metallic lustre but are brittle.'},
+      {q:'Boron carbide (B₄C) is notable for being:',opts:['The best conductor','Among the hardest known materials, used in body armour','The most reactive element','The lightest solid'],ans:1,exp:'Boron carbide is one of the hardest materials known (9.5 on Mohs scale), used in tank armour, bulletproof vests, and abrasives.'},
+      {q:'Which metalloid was historically called "inheritance powder" due to use as an undetectable poison?',opts:['Antimony','Tellurium','Boron','Arsenic'],ans:3,exp:'Arsenic(III) oxide was the favoured poison of European nobility — colourless, tasteless, and mimicking natural illness symptoms. Forensic detection only became possible in the 19th century.'},
+    ]
+  },
+  nonmetal:{
+    icon:'🌿',block:'p (and s)',periods:'1–4',valence_e:'4–6 (varies)',charge:'−2 to +6 typical',
+    melting:'Very low to moderate (H₂ 14K → C 3900K)',density:'Very low as gases, moderate as solids',
+    electronegativity:'High (2.5–3.5 Pauling)',hardness:'Gases/liquids — brittle as solids',
+    color_flame:{H:'Pale blue',C:'—',N:'—',O:'—',P:'Bright white',S:'Blue'},
+    trend_reactivity:55,trend_melting:20,trend_density:15,trend_en:75,
+    facts:[
+      '<b>Carbon is unique</b> — it forms over 10 million known compounds, more than all other elements combined, forming the basis of life.',
+      '<b>Oxygen is the most abundant element in Earth\'s crust</b> by mass (~46%), mostly locked in silicate minerals.',
+      '<b>Sulfur has been known since antiquity</b> as "brimstone" — mentioned in the Bible and used in early chemistry, gunpowder, and medicine.',
+      '<b>Phosphorus was discovered accidentally</b> by Hennig Brand in 1669 while trying to distil gold from urine — it glowed green in the dark.',
+      '<b>Nitrogen\'s triple bond</b> (N≡N) is one of the strongest in chemistry (941 kJ/mol), making atmospheric N₂ almost entirely inert.',
+      '<b>Selenium is toxic in large amounts but essential in trace quantities</b> — it is incorporated into selenoproteins critical for thyroid function.',
+    ],
+    comparisons:[
+      [1,'H','Hydrogen','Hex','14K','20K','0.00009','+1,−1','2.20'],
+      [6,'C','Carbon','Diam','3915K','3915K','2.27','+4,−4','2.55'],
+      [7,'N','Nitrogen','Hex','63K','77K','0.00125','+5,−3','3.04'],
+      [8,'O','Oxygen','Cub','54K','90K','0.00143','−2,−1','3.44'],
+      [15,'P','Phosphorus','Cub','317K','554K','1.82','+5,−3','2.19'],
+      [16,'S','Sulfur','Orth','388K','718K','2.07','+6,−2','2.58'],
+    ],
+    quiz:[
+      {q:'Which nonmetal is the basis of all known life on Earth?',opts:['Nitrogen','Oxygen','Carbon','Sulfur'],ans:2,exp:'Carbon\'s ability to form 4 covalent bonds and chain into complex molecules makes it the backbone of all biological molecules — proteins, DNA, lipids, carbohydrates.'},
+      {q:'What percentage of Earth\'s atmosphere is nitrogen by volume?',opts:['21%','50%','78%','95%'],ans:2,exp:'Nitrogen makes up ~78% of Earth\'s atmosphere as N₂ gas. Despite this abundance, it is largely inert due to the strong N≡N triple bond.'},
+      {q:'Oxygen\'s electronegativity on the Pauling scale is approximately:',opts:['2.20','2.55','3.04','3.44'],ans:3,exp:'Oxygen has an electronegativity of 3.44 — second only to fluorine — making it a very strong electron acceptor in chemical bonds.'},
+      {q:'Which nonmetal glowed in the dark when first discovered in 1669?',opts:['Carbon','Sulfur','Phosphorus','Selenium'],ans:2,exp:'Hennig Brand accidentally isolated white phosphorus from urine in 1669. It emits a faint green glow via chemiluminescence — oxidation in air produces excited HPO and PO species.'},
+      {q:'Why is the N≡N bond so strong that atmospheric nitrogen is nearly inert?',opts:['Nitrogen is a noble gas','The triple bond has a bond energy of ~941 kJ/mol','Nitrogen atoms are very heavy','Nitrogen has no valence electrons'],ans:1,exp:'N₂ has one σ bond and two π bonds with a combined bond energy of ~941 kJ/mol — one of the highest for any diatomic molecule, making it extremely difficult to break.'},
+    ]
+  },
+  halogen:{
+    icon:'⚗',block:'p',periods:'2–7',valence_e:7,charge:'−1 typical (+1 to +7 also)',
+    melting:'Very low (F₂ 53K → At ~575K)',density:'Low as gases, moderate as liquids',
+    electronegativity:'Very high (2.2–4.0 Pauling)',hardness:'Gases/liquids — brittle as solid iodine',
+    color_flame:{F:'—',Cl:'Yellow-green',Br:'Red-brown vapour',I:'Violet vapour',At:'—',Ts:'—'},
+    trend_reactivity:90,trend_melting:25,trend_density:35,trend_en:90,
+    facts:[
+      '<b>Fluorine is the most electronegative and most reactive element</b> — it reacts with almost everything, including glass, water, and some noble gases.',
+      '<b>Chlorine was the first chemical weapon</b> used in warfare — released at Ypres in April 1915 by German forces in WWI.',
+      '<b>Bromine is one of only two elements liquid at room temperature</b> — the other is mercury. It evaporates to a choking red-brown vapour.',
+      '<b>Iodine sublimes directly from solid to gas</b> when heated — producing a beautiful violet vapour (iodine vapour absorbs orange-red light).',
+      '<b>Teflon (PTFE) owes its non-stick properties to fluorine</b> — C–F bonds are among the strongest in organic chemistry.',
+      '<b>Halogens form salts with metals</b> — the word "halogen" comes from Greek: "hals" (salt) + "gennan" (to produce).',
+    ],
+    comparisons:[
+      [9,'F','Fluorine','Cub','53K','85K','0.0017','−1','3.98'],
+      [17,'Cl','Chlorine','Orth','172K','239K','0.00321','−1,+7','3.16'],
+      [35,'Br','Bromine','Orth','266K','332K','3.10','−1,+5','2.96'],
+      [53,'I','Iodine','Orth','387K','457K','4.94','−1,+7','2.66'],
+      [85,'At','Astatine','—','575K','610K','~7','−1,+1','2.20'],
+      [117,'Ts','Tennessine','—','~700K','~883K','~7.2','—','—'],
+    ],
+    quiz:[
+      {q:'Which halogen is the most electronegative element on the periodic table?',opts:['Chlorine','Bromine','Iodine','Fluorine'],ans:3,exp:'Fluorine has the highest electronegativity of all elements (3.98 on Pauling scale) — it attracts electrons more strongly than any other atom.'},
+      {q:'The word "halogen" comes from Greek meaning:',opts:['"Bright light"','"Salt producer"','"Reactive gas"','"Bitter substance"'],ans:1,exp:'"Halogen" derives from Greek "hals" (salt) + "gennan" (to produce) — all halogens readily combine with metals to form ionic salts.'},
+      {q:'What is the typical charge of a halogen ion in ionic compounds?',opts:['+1','+2','−1','−2'],ans:2,exp:'Halogens have 7 valence electrons and gain one more to form stable −1 anions (e.g. F⁻, Cl⁻, Br⁻, I⁻) with a full outer shell.'},
+      {q:'Which halogen is liquid at room temperature?',opts:['Fluorine','Chlorine','Bromine','Iodine'],ans:2,exp:'Bromine (Br₂) is one of only two elements liquid at room temperature (the other is mercury). It is a volatile, corrosive, red-brown liquid.'},
+      {q:'Reactivity of halogens as oxidising agents goes:',opts:['Increases down the group','Stays the same','Decreases down the group','Peaks at chlorine'],ans:2,exp:'Oxidising ability decreases down the group — fluorine is the strongest oxidising agent. Each step down, the atom is larger, attracting electrons less strongly.'},
+    ]
+  },
+  noble:{
+    icon:'👑',block:'p',periods:'1–7',valence_e:8,charge:'0 (rarely +2)',
+    melting:'Extremely low (He 0.95K → Rn 202K)',density:'Very low as gases',
+    electronegativity:'Not assigned (no bond formation)',hardness:'Gases — no mechanical hardness',
+    color_flame:{He:'Yellow',Ne:'Red-orange',Ar:'Violet-blue',Kr:'Pale violet',Xe:'Blue',Rn:'—'},
+    trend_reactivity:0,trend_melting:8,trend_density:5,trend_en:0,
+    facts:[
+      '<b>Noble gases were completely unknown until 1894</b> — their inertness meant they left no chemical traces and were invisible to earlier chemists.',
+      '<b>Argon makes up ~1% of Earth\'s atmosphere</b> — the third most abundant gas after nitrogen and oxygen, yet it was discovered last.',
+      '<b>Neon signs don\'t actually use neon for most colours</b> — pure neon gives red-orange, but other noble gases and mercury give different colours.',
+      '<b>Xenon can form compounds</b> — XeF₂, XeF₄, XeO₃ and others exist, challenging the old "completely inert" classification.',
+      '<b>Helium becomes a superfluid below 2.17 K</b> — it flows with zero viscosity, climbing up container walls and defying gravity.',
+      '<b>Radon is the leading cause of lung cancer</b> after smoking — a naturally occurring radioactive gas that seeps from uranium-bearing rocks.',
+    ],
+    comparisons:[
+      [2,'He','Helium','HCP','0.95K','4.22K','0.000164','0','—'],
+      [10,'Ne','Neon','FCC','24.6K','27.1K','0.0009','0','—'],
+      [18,'Ar','Argon','FCC','83.8K','87.3K','0.00178','0','—'],
+      [36,'Kr','Krypton','FCC','116K','120K','0.00369','0','—'],
+      [54,'Xe','Xenon','FCC','161K','165K','0.00589','0,+2,+4','—'],
+      [86,'Rn','Radon','FCC','202K','211K','0.00973','0','—'],
+    ],
+    quiz:[
+      {q:'Why are noble gases so chemically unreactive?',opts:['They have no electrons','Their outer electron shells are completely full','They are too heavy','They repel all other atoms'],ans:1,exp:'Noble gases have completely filled valence shells (s²p⁶ except He: s²). This stable configuration gives them no tendency to gain, lose, or share electrons.'},
+      {q:'Which noble gas was discovered in the Sun before being found on Earth?',opts:['Neon','Argon','Helium','Xenon'],ans:2,exp:'Helium was identified from spectral lines in sunlight during the 1868 solar eclipse — 27 years before it was isolated from uranium ore on Earth.'},
+      {q:'Which noble gas can actually form chemical compounds (e.g. XeF₂)?',opts:['Helium','Neon','Argon','Xenon'],ans:3,exp:'Xenon\'s large size and lower ionisation energy allow it to form compounds with highly electronegative elements. XeF₂, XeF₄, XeO₃, and XePtF₆ are well-documented.'},
+      {q:'What proportion of Earth\'s atmosphere is argon?',opts:['0.001%','~1%','5%','10%'],ans:1,exp:'Argon makes up ~0.93% of Earth\'s atmosphere — the third most abundant gas, predominantly from ⁴⁰K radioactive decay in Earth\'s crust over geological time.'},
+      {q:'What unusual property does liquid helium exhibit below 2.17 K?',opts:['It turns green','It becomes a superconductor','It becomes a superfluid with zero viscosity','It solidifies immediately'],ans:2,exp:'Below 2.17 K, helium-4 enters a superfluid state — it flows with zero viscosity, can creep up container walls, and transmits sound as a superfluid phonon.'},
+    ]
+  },
+  lanthanide:{
+    icon:'🌟',block:'f',periods:'6',valence_e:'2 (4f variable)',charge:'+3 typical',
+    melting:'High (Ce 1072K → Lu 1936K)',density:'Moderate to high (5–9.8 g/cm³)',
+    electronegativity:'Low to moderate (1.1–1.3 Pauling)',hardness:'Soft to moderately hard metals',
+    color_flame:{Ce:'—',Nd:'—',Pr:'—',Sm:'—',Eu:'—',Tb:'—'},
+    trend_reactivity:50,trend_melting:60,trend_density:55,trend_en:25,
+    facts:[
+      '<b>Neodymium magnets (Nd₂Fe₁₄B)</b> are the strongest permanent magnets — found in every hard drive, electric motor, and MRI machine.',
+      '<b>"Rare earth" is a misnomer</b> — cerium is more abundant in Earth\'s crust than copper, and most lanthanides are more common than gold.',
+      '<b>Lanthanide contraction</b> — the steady decrease in ionic radius across the series occurs because 4f electrons poorly shield nuclear charge.',
+      '<b>Europium produces red and blue phosphors</b> in LED displays and fluorescent tubes — the vivid colours of TV screens depend on it.',
+      '<b>Erbium is used in fibre optic amplifiers</b> — Er³⁺ ions emit light at 1550 nm, the optimal wavelength for long-distance optical communication.',
+      '<b>Gadolinium is used as MRI contrast agent</b> — its 7 unpaired electrons make it strongly paramagnetic, enhancing tissue contrast.',
+    ],
+    comparisons:[
+      [57,'La','Lanthanum','HCP','1193K','3730K','6.15','+3','1.10'],
+      [60,'Nd','Neodymium','DHCP','1297K','3347K','7.01','+3','1.14'],
+      [63,'Eu','Europium','BCC','1099K','1802K','5.24','+3,+2','1.20'],
+      [64,'Gd','Gadolinium','HCP','1585K','3546K','7.90','+3','1.20'],
+      [68,'Er','Erbium','HCP','1802K','3141K','9.07','+3','1.24'],
+      [71,'Lu','Lutetium','HCP','1936K','3675K','9.84','+3','1.27'],
+    ],
+    quiz:[
+      {q:'What is the primary oxidation state of most lanthanides?',opts:['+2','+3','+4','+1'],ans:1,exp:'The +3 oxidation state is most common across all lanthanides because removing 3 electrons (2 from 6s and 1 from 4f) gives a particularly stable configuration.'},
+      {q:'Neodymium is critical for which modern technology?',opts:['Nuclear reactors','Strongest permanent magnets (in motors, hard drives)','Touchscreens','Solar cells'],ans:1,exp:'Nd₂Fe₁₄B (neodymium-iron-boron) magnets are the strongest permanent magnets known — essential for EV motors, wind turbines, hard drives, and headphones.'},
+      {q:'What is "lanthanide contraction"?',opts:['Lanthanides shrink at low temperature','The steady decrease in ionic radius across the lanthanide series','All lanthanides having the same size','Lanthanides contracting in acid'],ans:1,exp:'As nuclear charge increases across the lanthanides, 4f electrons poorly shield each other. This causes the ionic radius to steadily decrease — "lanthanide contraction."'},
+      {q:'Why are lanthanides called "rare earth" elements?',opts:['They are all radioactive','They are found only in rare rocks','They were historically difficult to separate and identify','They exist only in space'],ans:2,exp:'The name "rare earth" reflects historical difficulty in isolating them — they occur together in minerals and have very similar chemistry, making separation extremely challenging.'},
+      {q:'Gadolinium (Gd) is widely used as an MRI contrast agent because:',opts:['It is cheap','Its 7 unpaired electrons make it strongly paramagnetic','It is transparent to X-rays','It is non-toxic'],ans:1,exp:'Gd³⁺ has 7 unpaired 4f electrons — the maximum possible — giving it the highest paramagnetic moment of any ion, enhancing proton relaxation in MRI scans.'},
+    ]
+  },
+  actinide:{
+    icon:'☢',block:'f',periods:'7',valence_e:'2 (5f variable)',charge:'+3 to +6 typical',
+    melting:'Variable (Ac 1323K → Cm ~1613K)',density:'High (Th 11.7 → Pu 19.8 g/cm³)',
+    electronegativity:'Low (1.1–1.5 Pauling)',hardness:'Soft to moderately hard',
+    color_flame:{Th:'—',U:'—',Pu:'—',Am:'—','Pa':'—','Ac':'—'},
+    trend_reactivity:55,trend_melting:50,trend_density:70,trend_en:22,
+    facts:[
+      '<b>All actinides are radioactive</b> — there are no stable actinide isotopes. Thorium and uranium have very long half-lives (~billions of years).',
+      '<b>Uranium was used as glass colourant</b> before its radioactivity was discovered — "uranium glass" glows green under UV light.',
+      '<b>Plutonium was the first purely synthetic element</b> produced in weighable quantities — first isolated by Glenn Seaborg\'s team in 1941.',
+      '<b>Americium-241 is in smoke detectors</b> — its alpha particles ionise air between two electrodes; smoke disrupts this current and triggers the alarm.',
+      '<b>Neptunium was the first transuranium element</b> — discovered in 1940 by bombarding uranium with neutrons, named after the planet Neptune.',
+      '<b>Californium-252 spontaneously fissions</b> — used as a portable neutron source for cancer treatment and nuclear reactor startup.',
+    ],
+    comparisons:[
+      [90,'Th','Thorium','FCC','2023K','5061K','11.7','+4','1.30'],
+      [92,'U','Uranium','Orth','1405K','4404K','19.1','+6,+4','1.38'],
+      [93,'Np','Neptunium','Orth','917K','4273K','20.2','+5,+4','1.36'],
+      [94,'Pu','Plutonium','Mon','913K','3501K','19.8','+4,+3','1.28'],
+      [95,'Am','Americium','DHCP','1449K','2880K','12.0','+3,+4','1.30'],
+      [96,'Cm','Curium','DHCP','1613K','3383K','13.5','+3','1.30'],
+    ],
+    quiz:[
+      {q:'What is true of all actinides?',opts:['They are all stable','All are radioactive','All are man-made','All are gases'],ans:1,exp:'Every actinide is radioactive — they all undergo nuclear decay. Thorium and uranium have half-lives comparable to Earth\'s age, but all eventually decay.'},
+      {q:'Which actinide is found in household smoke detectors?',opts:['Uranium','Thorium','Americium-241','Plutonium'],ans:2,exp:'Am-241 emits alpha particles that ionise the air gap between two electrodes. Smoke particles absorb these ions, reducing current and triggering the alarm.'},
+      {q:'Uranium glass glows under UV light due to:',opts:['Radioactive decay','Fluorescence from uranium ions','Phosphorescence','Reflection of UV'],ans:1,exp:'U⁶⁺ and related uranium ions fluoresce brilliant green under UV light. This was exploited in decorative "Vaseline glass" long before uranium\'s radioactivity was understood.'},
+      {q:'Which actinide was the first purely synthetic element made in visible (weighable) quantities?',opts:['Neptunium','Americium','Plutonium','Curium'],ans:2,exp:'Glenn Seaborg\'s team at Berkeley produced the first weighable amount of plutonium in 1942. Earlier transuranics were detected but not isolated in visible quantities.'},
+      {q:'What is the most common oxidation state of the early actinides (Th–Pu)?',opts:['+2','+3','+4 to +6 (variable)','Only +3'],ans:2,exp:'Early actinides (Th–Am) show highly variable oxidation states (+3 to +6) because both 5f and 6d electrons participate in bonding — unlike lanthanides which almost always give +3.'},
+    ]
+  },
+};
+
+/* ═══ BUILD NAV ═══ */
+const navBody=document.getElementById('nav-body');
+Object.entries(GRP).forEach(([key,g])=>{
+  const els=ELS.filter(e=>e[4]===key);
+  const sec=document.createElement('div'); sec.className='nav-sec';
+
+  /* Split row: label (→ group modal) + toggle arrow (→ expand chips) */
+  const row=document.createElement('div'); row.className='nav-btn-row';
+
+  const lbl=document.createElement('button'); lbl.className='nav-btn-label'; lbl.setAttribute('data-k',key);
+  lbl.innerHTML=`<span class="nav-dot" style="background:${g.bg};border:1px solid ${g.br}"></span><span>${g.short}</span><span class="nav-cnt">${els.length}</span>`;
+  lbl.onclick=()=>openGroupModal(key);
+
+  /* "Quiz" quick-access button */
+  const qb=document.createElement('button'); qb.className='nav-open-btn';
+  qb.style.cssText=`background:${g.bg};color:${g.tx};border-color:${g.br}70`;
+  qb.textContent='Quiz'; qb.title=`${g.short} group quiz`;
+  qb.onclick=e=>{e.stopPropagation();openGroupModal(key,'gquiz');};
+
+  const tog=document.createElement('button'); tog.className='nav-btn-toggle'; tog.setAttribute('data-k',key);
+  tog.innerHTML='›'; tog.title='Show elements';
+  tog.onclick=()=>{
+    const o=tog.classList.contains('open');
+    tog.classList.toggle('open',!o);
+    list.classList.toggle('open',!o);
+    lbl.classList.toggle('active',!o);
+    setFilter(o?'all':key);
+  };
+
+  row.appendChild(lbl); row.appendChild(qb); row.appendChild(tog);
+
+  const list=document.createElement('div'); list.className='nav-els';
+  const desc=document.createElement('div'); desc.className='nav-gdesc'; desc.textContent=g.desc;
+  const chips=document.createElement('div'); chips.className='nav-chips';
+  els.sort((a,b)=>a[0]-b[0]).forEach(el=>{
+    const c=document.createElement('span'); c.className='chip';
+    c.style.cssText=`background:${g.bg};color:${g.tx};border-color:${g.br}70`;
+    c.textContent=el[1]; c.title=`${el[2]} — click for details & quiz`;
+    c.onclick=e=>{e.stopPropagation(); openModal(el[0],'details');};
+    chips.appendChild(c);
+  });
+  list.appendChild(desc); list.appendChild(chips);
+  sec.appendChild(row); sec.appendChild(list);
+  navBody.appendChild(sec);
+});
+
+/* ═══ LEGEND ═══ */
+const legDiv=document.getElementById('legend');
+Object.entries(GRP).forEach(([key,g])=>{
+  const d=document.createElement('div'); d.className='leg';
+  d.innerHTML=`<span class="leg-dot" style="background:${g.bg};border:1px solid ${g.br}"></span><span>${g.label}</span>`;
+  d.onclick=()=>setFilter(activeF===key?'all':key);
+  legDiv.appendChild(d);
+});
+
+/* ═══ FILTER BAR ═══ */
+const fbar=document.getElementById('fbar');
+const aBtn=document.createElement('button'); aBtn.className='fbtn all active'; aBtn.textContent='All elements'; aBtn.onclick=()=>setFilter('all'); fbar.appendChild(aBtn);
+Object.entries(GRP).forEach(([key,g])=>{
+  const b=document.createElement('button'); b.className='fbtn'; b.setAttribute('data-k',key);
+  b.style.cssText=`background:${g.bg};color:${g.tx};border-color:${g.br}80`;
+  b.textContent=g.short; b.onclick=()=>setFilter(key); fbar.appendChild(b);
+});
+
+/* ═══ GROUP NUMBER HEADER ═══ */
+const ghdr=document.getElementById('ghdr');
+for(let i=1;i<=18;i++){const d=document.createElement('div');d.className='gh';d.textContent=i;ghdr.appendChild(d);}
+
+/* ═══ BUILD GRID ═══ */
+const pgrid=document.getElementById('pgrid');
+function mkEl(el){
+  if(!el){const g=document.createElement('div');g.className='gcell';return g;}
+  const g=GRP[el[4]];
+  const d=document.createElement('div'); d.className='el';
+  d.style.cssText=`background:${g.bg};color:${g.tx};border-color:${g.br}60`;
+  d.innerHTML=`<span class="n">${el[0]}</span><span class="s">${el[1]}</span><span class="nm">${el[2].length>11?el[2].slice(0,10)+'…':el[2]}</span>`;
+  d.setAttribute('data-k',el[4]); d.setAttribute('data-z',el[0]);
+  d.addEventListener('mouseenter',showTip); d.addEventListener('mouseleave',hideTip);
+  d.addEventListener('click',()=>{hideTip();openModal(el[0],'details');});
+  return d;
+}
+function buildGrid(){
+  pgrid.innerHTML='';
+  for(let r=1;r<=7;r++){
+    for(let c=1;c<=18;c++){
+      const el=ELS.find(e=>e[5]===r&&e[6]===c);
+      if(r===6&&c===3&&!el){const ph=document.createElement('div');ph.className='ph';ph.innerHTML='<span>57–71</span>';pgrid.appendChild(ph);}
+      else if(r===7&&c===3&&!el){const ph=document.createElement('div');ph.className='ph';ph.innerHTML='<span>89–103</span>';pgrid.appendChild(ph);}
+      else{pgrid.appendChild(mkEl(el||null));}
+    }
+  }
+  const sep=document.createElement('div');sep.className='sep';pgrid.appendChild(sep);
+  const ll=document.createElement('div');ll.className='rlbl';ll.textContent='Lanthanides — Period 6 · f-block (Ce–Lu)';pgrid.appendChild(ll);
+  for(let c=1;c<=18;c++){
+    if(c<=3){const d=document.createElement('div');d.className='gcell';pgrid.appendChild(d);}
+    else if(c>=4&&c<=17){pgrid.appendChild(mkEl(ELS.find(e=>e[5]===9&&e[6]===c)||null));}
+    else{const d=document.createElement('div');d.className='gcell';pgrid.appendChild(d);}
+  }
+  const al=document.createElement('div');al.className='rlbl';al.textContent='Actinides — Period 7 · f-block (Th–Lr)';pgrid.appendChild(al);
+  for(let c=1;c<=18;c++){
+    if(c<=3){const d=document.createElement('div');d.className='gcell';pgrid.appendChild(d);}
+    else if(c>=4&&c<=17){pgrid.appendChild(mkEl(ELS.find(e=>e[5]===10&&e[6]===c)||null));}
+    else{const d=document.createElement('div');d.className='gcell';pgrid.appendChild(d);}
+  }
+  applyF();
+}
+
+function setFilter(f){
+  activeF=f; hlZ=null;
+  document.querySelectorAll('.fbtn').forEach(b=>{const k=b.getAttribute('data-k');b.classList.toggle('active',f==='all'?b.classList.contains('all'):k===f);});
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    const k=b.getAttribute('data-k'),isT=k===f;
+    b.classList.toggle('active',isT);
+    if(!isT){b.classList.remove('open');b.nextElementSibling.classList.remove('open');}
+    else{b.classList.add('open');b.nextElementSibling.classList.add('open');}
+  });
+  const panel=document.getElementById('ipanel');
+  if(f!=='all'){
+    const g=GRP[f]; const cnt=ELS.filter(e=>e[4]===f).length;
+    panel.className='ipanel on'; panel.style.borderLeft=`3px solid ${g.br}`;
+    panel.innerHTML=`<h3 style="color:${g.tx}">${g.label}</h3><p>${g.desc}</p>
+      <div class="istats">
+        <div class="istat" style="background:${g.bg}"><div class="sv" style="color:${g.tx}">${cnt}</div><div class="sl" style="color:${g.tx}">elements</div></div>
+        <div class="istat" style="background:${g.bg}"><div class="sv" style="color:${g.tx};font-size:11px">${g.bond}</div><div class="sl" style="color:${g.tx}">bonding type</div></div>
+      </div>`;
+  } else{panel.className='ipanel';}
+  applyF();
+}
+
+function applyF(){
+  document.querySelectorAll('.el[data-k]').forEach(cell=>{
+    const k=cell.getAttribute('data-k'),z=+cell.getAttribute('data-z');
+    cell.classList.remove('dim','hl');
+    if(hlZ!==null){if(z===hlZ)cell.classList.add('hl');else cell.classList.add('dim');}
+    else if(activeF!=='all'&&k!==activeF){cell.classList.add('dim');}
+  });
+}
+
+/* ═══════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════ */
+let quizState={qIdx:0,score:0,answered:[],shuffled:[]};
+
+function openModal(z, startTab){
+  const el=ELS.find(e=>e[0]===z); if(!el)return;
+  const g=GRP[el[4]]; const ex=getED(z);
+  const period=el[5]<=7?el[5]:(el[5]===9?6:7);
+  const block=el[6]<=2?'s':(el[5]===9||el[5]===10?'f':(el[6]<=12?'d':'p'));
+  const sorted=ELS.slice().sort((a,b)=>a[0]-b[0]);
+  const idx=sorted.findIndex(e=>e[0]===z);
+  const prevZ=idx>0?sorted[idx-1][0]:null;
+  const nextZ=idx<sorted.length-1?sorted[idx+1][0]:null;
+
+  hlZ=z; applyF();
+
+  /* Header */
+  document.getElementById('m-head').innerHTML=`
+    <div class="m-symbox" style="background:${g.bg};border-color:${g.br};color:${g.tx}">
+      <div class="m-sym">${el[1]}</div>
+      <div class="m-znum">Z = ${el[0]}</div>
+    </div>
+    <div class="m-info">
+      <div class="m-name">${el[2]}</div>
+      <div class="m-tagline">${ex.cat} · ${ex.phase} at STP · ${block.toUpperCase()}-block · Period ${period}</div>
+      <div class="m-badges">
+        <span class="mbadge" style="background:${g.bg};color:${g.tx};border-color:${g.br}">${g.label}</span>
+        <span class="mbadge" style="background:rgba(255,255,255,0.06);color:var(--text2);border-color:var(--border)">Group ${el[6]}</span>
+        <span class="mbadge" style="background:rgba(255,255,255,0.06);color:var(--text2);border-color:var(--border)">${g.bond}</span>
+        <span class="mbadge" style="background:rgba(255,255,255,0.06);color:var(--text2);border-color:var(--border)">Mass: ${el[3]}</span>
+      </div>
+    </div>
+    <button class="m-close" id="mclosebtn">✕</button>
+  `;
+  document.getElementById('mclosebtn').onclick=closeModal;
+
+  /* Tabs */
+  const TABS=[
+    {id:'details',label:'Details'},
+    {id:'properties',label:'Properties'},
+    {id:'chemistry',label:'Chemistry'},
+    {id:'history',label:'History & Uses'},
+    {id:'quiz',label:'Quiz ✦'},
+  ];
+  const tabsEl=document.getElementById('m-tabs');
+  tabsEl.innerHTML='';
+  TABS.forEach(t=>{
+    const b=document.createElement('button'); b.className='mtab'; b.setAttribute('data-tab',t.id);
+    b.textContent=t.label;
+    b.onclick=()=>switchTab(t.id);
+    tabsEl.appendChild(b);
+  });
+
+  /* Build all panels */
+  const panelsEl=document.getElementById('m-panels');
+  panelsEl.innerHTML='';
+
+  /* DETAILS panel */
+  const shellLabels=['K','L','M','N','O','P','Q'];
+  let shellHTML='<div class="e-config">';
+  (ex.shells||[]).forEach((cnt,i)=>{
+    shellHTML+=`<div class="e-shell"><div class="e-ring" style="border-color:${g.br};color:${g.tx};background:${g.bg}">${cnt}</div><div class="e-lbl">${shellLabels[i]||'?'}</div></div>`;
+    if(i<ex.shells.length-1) shellHTML+=`<div class="e-arrow">›</div>`;
+  });
+  shellHTML+='</div>';
+
+  const detPanel=document.createElement('div'); detPanel.className='tpanel'; detPanel.id='tab-details';
+  detPanel.innerHTML=`
+    <div class="msec">
+      <div class="msec-title">Atomic identity</div>
+      <div class="mstats">
+        <div class="mstat"><div class="mk">Atomic number</div><div class="mv">${el[0]}</div></div>
+        <div class="mstat"><div class="mk">Atomic mass</div><div class="mv">${el[3]} <span class="mu">u</span></div></div>
+        <div class="mstat"><div class="mk">Symbol</div><div class="mv">${el[1]}</div></div>
+        <div class="mstat"><div class="mk">Period</div><div class="mv">${period}</div></div>
+        <div class="mstat"><div class="mk">Group col.</div><div class="mv">${el[6]}</div></div>
+        <div class="mstat"><div class="mk">Block</div><div class="mv">${block.toUpperCase()}-block</div></div>
+      </div>
+    </div>
+    <div class="msec">
+      <div class="msec-title">Electron shell configuration</div>
+      ${shellHTML}
+    </div>
+    <div class="msec">
+      <div class="msec-title">Classification</div>
+      <div class="mprops">
+        <div class="mprop"><span class="pk">Element group</span><span class="pv">${g.label}</span></div>
+        <div class="mprop"><span class="pk">Category</span><span class="pv">${ex.cat}</span></div>
+        <div class="mprop"><span class="pk">Phase at STP</span><span class="pv">${ex.phase}</span></div>
+        <div class="mprop"><span class="pk">Bonding type</span><span class="pv">${g.bond}</span></div>
+        <div class="mprop"><span class="pk">Crystal structure</span><span class="pv">${ex.crystal}</span></div>
+      </div>
+    </div>
+    <div class="msec">
+      <div class="msec-title">Did you know?</div>
+      <div class="m-fact" style="border-color:${g.br}">${ex.fact}</div>
+    </div>
+  `;
+  panelsEl.appendChild(detPanel);
+
+  /* PROPERTIES panel */
+  const rk=ex.reactivity||{};
+  function rBar(lbl,val,max=10){
+    const pct=Math.min(100,Math.round((val/max)*100));
+    return `<div class="rbar-row"><span class="rbar-lbl">${lbl}</span><div class="rbar-track"><div class="rbar-fill" style="width:${pct}%;background:${g.br}"></div></div><span class="rbar-val">${val}/10</span></div>`;
+  }
+  const isoHTML=(ex.isotopes||[]).map(iso=>`<div class="iso"><div class="isym">${iso.sym}</div>${iso.name} ${iso.stable?'<span style="color:#7dd87f;font-size:9px">stable</span>':'<span style="color:#e88888;font-size:9px">radioactive</span>'}</div>`).join('');
+
+  const propPanel=document.createElement('div'); propPanel.className='tpanel'; propPanel.id='tab-properties';
+  propPanel.innerHTML=`
+    <div class="msec">
+      <div class="msec-title">Physical properties</div>
+      <div class="mstats">
+        <div class="mstat"><div class="mk">Melting point</div><div class="mv">${ex.mp!=='—'?Number(ex.mp).toFixed(1):ex.mp} <span class="mu">K</span></div></div>
+        <div class="mstat"><div class="mk">Boiling point</div><div class="mv">${ex.bp!=='—'?Number(ex.bp).toFixed(1):ex.bp} <span class="mu">K</span></div></div>
+        <div class="mstat"><div class="mk">Density (STP)</div><div class="mv">${ex.dens} <span class="mu">g/cm³</span></div></div>
+        <div class="mstat"><div class="mk">Crust abundance</div><div class="mv">${ex.abund} <span class="mu">ppm</span></div></div>
+        <div class="mstat"><div class="mk">Melting point °C</div><div class="mv">${ex.mp!=='—'?(Number(ex.mp)-273.15).toFixed(1):ex.mp} <span class="mu">°C</span></div></div>
+        <div class="mstat"><div class="mk">Boiling point °C</div><div class="mv">${ex.bp!=='—'?(Number(ex.bp)-273.15).toFixed(1):ex.bp} <span class="mu">°C</span></div></div>
+      </div>
+    </div>
+    <div class="msec">
+      <div class="msec-title">Reactivity indicators</div>
+      <div class="rbar-wrap">
+        ${rBar('Reactivity with water',rk.water||3)}
+        ${rBar('Reactivity with acids',rk.acid||3)}
+        ${rBar('Reactivity with oxygen',rk.oxygen||3)}
+        ${rBar('Reactivity with metals',rk.metals||3)}
+      </div>
+    </div>
+    ${isoHTML?`<div class="msec"><div class="msec-title">Key isotopes</div><div class="isotope-grid">${isoHTML}</div></div>`:''}
+  `;
+  panelsEl.appendChild(propPanel);
+
+  /* CHEMISTRY panel */
+  const chemPanel=document.createElement('div'); chemPanel.className='tpanel'; chemPanel.id='tab-chemistry';
+  chemPanel.innerHTML=`
+    <div class="msec">
+      <div class="msec-title">Chemical properties</div>
+      <div class="mprops">
+        <div class="mprop"><span class="pk">Electronegativity (Pauling)</span><span class="pv">${ex.en}</span></div>
+        <div class="mprop"><span class="pk">Valence electrons</span><span class="pv">${ex.valence}</span></div>
+        <div class="mprop"><span class="pk">Oxidation states</span><span class="pv">${ex.ox}</span></div>
+        <div class="mprop"><span class="pk">Bonding type</span><span class="pv">${g.bond}</span></div>
+        <div class="mprop"><span class="pk">Crystal structure</span><span class="pv">${ex.crystal}</span></div>
+        <div class="mprop"><span class="pk">Phase at STP</span><span class="pv">${ex.phase}</span></div>
+      </div>
+    </div>
+    <div class="msec">
+      <div class="msec-title">Group chemistry</div>
+      <div class="m-fact" style="border-color:${g.br};font-size:11px;line-height:1.8">${g.desc}</div>
+    </div>
+    <div class="msec">
+      <div class="msec-title">Electron configuration (shells)</div>
+      ${shellHTML}
+      <div class="mprops" style="margin-top:10px">
+        <div class="mprop"><span class="pk">Block</span><span class="pv">${block.toUpperCase()}-block</span></div>
+        <div class="mprop"><span class="pk">Valence shell electrons</span><span class="pv">${Array.isArray(ex.shells)&&ex.shells.length?ex.shells[ex.shells.length-1]:'—'}</span></div>
+        <div class="mprop"><span class="pk">Total electron shells</span><span class="pv">${Array.isArray(ex.shells)?ex.shells.length:'—'}</span></div>
+      </div>
+    </div>
+  `;
+  panelsEl.appendChild(chemPanel);
+
+  /* HISTORY & USES panel */
+  const histPanel=document.createElement('div'); histPanel.className='tpanel'; histPanel.id='tab-history';
+  histPanel.innerHTML=`
+    <div class="msec">
+      <div class="msec-title">Discovery</div>
+      <div class="m-disc">
+        <div class="dcard"><div class="dk">Year</div><div class="dv">${ex.yr}</div></div>
+        <div class="dcard"><div class="dk">Discovered by</div><div class="dv">${ex.who}</div></div>
+        <div class="dcard"><div class="dk">Country</div><div class="dv">${ex.where}</div></div>
+      </div>
+    </div>
+    <div class="msec">
+      <div class="msec-title">Name origin</div>
+      <div class="mprops">
+        <div class="mprop"><span class="pk">Element name</span><span class="pv">${el[2]}</span></div>
+        <div class="mprop"><span class="pk">Symbol</span><span class="pv">${el[1]}</span></div>
+        <div class="mprop"><span class="pk">Atomic number</span><span class="pv">${el[0]}</span></div>
+      </div>
+    </div>
+    <div class="msec">
+      <div class="msec-title">Key uses &amp; applications</div>
+      <div class="m-uses">${(ex.uses||[]).map(u=>`<span class="use-tag">${u}</span>`).join('')}</div>
+    </div>
+    <div class="msec">
+      <div class="msec-title">Fun fact</div>
+      <div class="m-fact" style="border-color:${g.br}">${ex.fact}</div>
+    </div>
+  `;
+  panelsEl.appendChild(histPanel);
+
+  /* QUIZ panel */
+  const quizPanel=document.createElement('div'); quizPanel.className='tpanel'; quizPanel.id='tab-quiz';
+  panelsEl.appendChild(quizPanel);
+  initQuiz(z, g, quizPanel);
+
+  /* Footer */
+  document.getElementById('m-foot').innerHTML=`
+    <button class="mfbtn" id="m-prev" ${!prevZ?'disabled':''}>← ${prevZ?ELS.find(e=>e[0]===prevZ)[1]:''}</button>
+    <span class="m-foot-center">${el[0]} / 118 elements</span>
+    <button class="mfbtn" id="m-next" ${!nextZ?'disabled':''}>→ ${nextZ?ELS.find(e=>e[0]===nextZ)[1]:''}</button>
+  `;
+  if(prevZ) document.getElementById('m-prev').onclick=()=>openModal(prevZ,'details');
+  if(nextZ) document.getElementById('m-next').onclick=()=>openModal(nextZ,'details');
+
+  document.getElementById('overlay').classList.add('open');
+  panelsEl.scrollTop=0;
+  switchTab(startTab||'details');
+}
+
+function switchTab(id){
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.toggle('active',t.getAttribute('data-tab')===id));
+  document.querySelectorAll('.tpanel').forEach(p=>p.classList.toggle('active',p.id===`tab-${id}`));
+}
+
+/* ═══════════════════════════════════════════
+   QUIZ ENGINE
+═══════════════════════════════════════════ */
+function initQuiz(z, g, container){
+  const ex=getED(z);
+  const qs=ex.quiz||[];
+  const state={qIdx:0,score:0,answered:new Array(qs.length).fill(null),total:qs.length};
+  renderQuiz(z,g,qs,state,container);
+}
+
+function renderQuiz(z,g,qs,state,container){
+  container.innerHTML='';
+  if(!qs.length){
+    container.innerHTML=`<div style="padding:30px;text-align:center;color:var(--text2);font-size:12px">No quiz questions available for this element yet.</div>`;
+    return;
+  }
+
+  /* If showing final result */
+  if(state.qIdx>=state.total && state.answered.every(a=>a!==null)){
+    const pct=Math.round((state.score/state.total)*100);
+    const grade=pct>=80?{label:'Excellent!',bg:'rgba(76,175,80,0.15)',col:'#7dd87f'}:pct>=60?{label:'Good work',bg:'rgba(255,193,7,0.12)',col:'#ffd54f'}:{label:'Keep learning!',bg:'rgba(226,85,85,0.12)',col:'#e88888'};
+    container.innerHTML=`
+      <div class="quiz-result show">
+        <div class="result-score" style="color:${g.tx}">${state.score}<span style="font-size:24px;color:var(--text2)">/${state.total}</span></div>
+        <div class="result-label">Quiz complete for <b>${ELS.find(e=>e[0]===z)[2]}</b></div>
+        <div class="result-grade" style="background:${grade.bg};color:${grade.col}">${grade.label} — ${pct}%</div>
+        <div class="result-breakdown">
+          <div class="rb-item"><b style="color:#7dd87f">${state.score}</b> correct</div>
+          <div class="rb-item"><b style="color:#e88888">${state.total-state.score}</b> wrong</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:10px">
+          <button class="qbtn primary" onclick="(function(){const ex=getED(${z});const qs=ex.quiz||[];const st={qIdx:0,score:0,answered:new Array(qs.length).fill(null),total:qs.length};renderQuiz(${z},GRP['${ELS.find(e=>e[0]===z)[4]}'],qs,st,document.getElementById('tab-quiz'));})()">Retry quiz</button>
+          <button class="qbtn" onclick="switchTab('details')">Back to details</button>
+        </div>
+        <div style="margin-top:14px;width:100%">
+          <div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Your answers</div>
+          ${qs.map((q,i)=>`<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:11px;display:flex;gap:8px;align-items:baseline">
+            <span style="color:${state.answered[i]===q.ans?'#7dd87f':'#e88888'};font-size:14px">${state.answered[i]===q.ans?'✓':'✗'}</span>
+            <div><div style="color:var(--text);margin-bottom:2px">${q.q}</div><div style="color:var(--text2);font-size:10px">Correct: ${q.opts[q.ans]}</div></div>
+          </div>`).join('')}
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const qi=state.qIdx<state.total?state.qIdx:(state.total-1);
+  const q=qs[qi];
+  const already=state.answered[qi];
+  const letters=['A','B','C','D'];
+
+  /* progress dots */
+  const dotsHTML=qs.map((_,i)=>{
+    const a=state.answered[i];
+    let cls='qs-dot';
+    if(a!==null) cls+=a===qs[i].ans?' done-ok':' done-fail';
+    if(i===qi) return `<div class="${cls}" style="width:10px;height:10px;border:1.5px solid ${g.br}"></div>`;
+    return `<div class="${cls}"></div>`;
+  }).join('');
+
+  container.innerHTML=`
+    <div class="quiz-wrap">
+      <div class="quiz-score-bar">
+        <span class="qs-label">Question ${qi+1} of ${state.total}</span>
+        <div class="qs-prog">${dotsHTML}</div>
+        <span class="qs-score" style="color:${g.tx}">${state.score} / ${state.total}</span>
+      </div>
+      <div class="q-card">
+        <div class="q-num">Question ${qi+1}</div>
+        <div class="q-text">${q.q}</div>
+        <div class="q-options" id="q-opts"></div>
+        <div class="q-feedback" id="q-fb"></div>
+      </div>
+      <div class="q-nav">
+        <button class="qbtn" id="qprev" ${qi===0?'disabled':''}>← Previous</button>
+        <button class="qbtn" id="qskip" ${already!==null?'style="display:none"':''}>Skip</button>
+        <button class="qbtn primary" id="qnext" ${already===null?'disabled':''}>
+          ${qi===state.total-1?'See results':'Next →'}
+        </button>
+      </div>
+    </div>
+  `;
+
+  /* Render options */
+  const optsDiv=document.getElementById('q-opts');
+  q.opts.forEach((opt,oi)=>{
+    const btn=document.createElement('button'); btn.className='q-opt';
+    btn.innerHTML=`<span class="q-opt-letter">${letters[oi]}</span>${opt}`;
+    if(already!==null){
+      btn.disabled=true;
+      if(oi===q.ans) btn.classList.add(already===q.ans&&oi===already?'correct':'reveal');
+      else if(oi===already&&already!==q.ans) btn.classList.add('wrong');
+    } else {
+      btn.onclick=()=>{
+        const correct=oi===q.ans;
+        if(correct) state.score++;
+        state.answered[qi]=oi;
+        const fb=document.getElementById('q-fb');
+        fb.innerHTML=`<b>${correct?'Correct!':'Incorrect.'}</b> ${q.exp}`;
+        fb.className=`q-feedback show ${correct?'ok':'fail'}`;
+        document.querySelectorAll('.q-opt').forEach((b,bi)=>{
+          b.disabled=true;
+          if(bi===q.ans) b.classList.add(oi===q.ans?'correct':'reveal');
+          else if(bi===oi&&!correct) b.classList.add('wrong');
+        });
+        document.getElementById('qnext').disabled=false;
+        document.getElementById('qskip').style.display='none';
+      };
+    }
+    optsDiv.appendChild(btn);
+  });
+
+  /* Show feedback if already answered */
+  if(already!==null){
+    const fb=document.getElementById('q-fb');
+    fb.innerHTML=`<b>${already===q.ans?'Correct!':'Incorrect.'}</b> ${q.exp}`;
+    fb.className=`q-feedback show ${already===q.ans?'ok':'fail'}`;
+  }
+
+  /* Nav buttons */
+  document.getElementById('qprev').onclick=()=>{state.qIdx=Math.max(0,qi-1);renderQuiz(z,g,qs,state,container);};
+  document.getElementById('qskip').onclick=()=>{state.answered[qi]=-1;state.qIdx=qi+1;renderQuiz(z,g,qs,state,container);};
+  document.getElementById('qnext').onclick=()=>{state.qIdx=qi+1;renderQuiz(z,g,qs,state,container);};
+}
+
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  hlZ=null; applyF();
+}
+document.getElementById('overlay').addEventListener('click',e=>{if(e.target===document.getElementById('overlay'))closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+/* ═══ HOVER TOOLTIP ═══ */
+function showTip(e){
+  const z=+this.getAttribute('data-z');
+  const el=ELS.find(x=>x[0]===z); if(!el)return;
+  const g=GRP[el[4]];
+  const period=el[5]<=7?el[5]:(el[5]===9?'6 (Ln)':'7 (An)');
+  document.getElementById('tip').innerHTML=`
+    <div class="t-sym" style="color:${g.tx}">${el[1]}</div>
+    <div class="t-name">${el[2]}</div>
+    <span class="t-badge" style="background:${g.bg};color:${g.tx}">${g.label}</span>
+    <div class="t-row">Atomic number: <b>${el[0]}</b></div>
+    <div class="t-row">Atomic mass: <b>${el[3]}</b></div>
+    <div class="t-row">State (STP): <b>${stOf(el[1])}</b></div>
+    <div class="t-row">Period: <b>${period}</b> · Group: <b>${el[6]}</b></div>
+    <div class="t-div"></div>
+    <div class="t-hint">Click to open details &amp; quiz</div>`;
+  document.getElementById('tip').style.display='block';
+  moveTip(e);
+}
+function moveTip(e){
+  const t=document.getElementById('tip');
+  let x=e.clientX+16,y=e.clientY+16;
+  if(x+230>window.innerWidth)x=e.clientX-238;
+  if(y+220>window.innerHeight)y=e.clientY-228;
+  t.style.left=x+'px';t.style.top=y+'px';
+}
+document.addEventListener('mousemove',e=>{if(document.getElementById('tip').style.display==='block')moveTip(e);});
+function hideTip(){document.getElementById('tip').style.display='none';}
+
+
+/* ═══════════════════════════════════════════
+   GROUP MODAL ENGINE
+═══════════════════════════════════════════ */
+let gQuizStates={};
+
+function openGroupModal(key, startTab){
+  const g=GRP[key]; const gx=GRPX[key]; if(!g||!gx)return;
+  const els=ELS.filter(e=>e[4]===key).sort((a,b)=>a[0]-b[0]);
+  const cnt=els.length;
+
+  /* Header */
+  document.getElementById('gm-head').innerHTML=`
+    <div class="gm-icon" style="background:${g.bg};border-color:${g.br};color:${g.tx}">${gx.icon}</div>
+    <div class="gm-info">
+      <div class="gm-title" style="color:${g.tx}">${g.label}</div>
+      <div class="gm-sub">${cnt} elements · ${gx.block.toUpperCase()}-block · Periods ${gx.periods}</div>
+      <div class="gm-badges">
+        <span class="gm-badge" style="background:${g.bg};color:${g.tx};border-color:${g.br}">Valence e⁻: ${gx.valence_e}</span>
+        <span class="gm-badge" style="background:${g.bg};color:${g.tx};border-color:${g.br}">Charge: ${gx.charge}</span>
+        <span class="gm-badge" style="background:rgba(255,255,255,0.06);color:var(--text2);border-color:var(--border)">${g.bond}</span>
+      </div>
+    </div>
+    <button class="gm-close" id="gm-close-btn">✕</button>
+  `;
+  document.getElementById('gm-close-btn').onclick=closeGroupModal;
+
+  /* Tabs */
+  const GTABS=[
+    {id:'goverview',label:'Overview'},
+    {id:'gelements',label:'Elements'},
+    {id:'gtrends',label:'Trends & Properties'},
+    {id:'gfacts',label:'Key Facts'},
+    {id:'gquiz',label:'Group Quiz ✦'},
+  ];
+  const gtabsEl=document.getElementById('gm-tabs'); gtabsEl.innerHTML='';
+  GTABS.forEach(t=>{
+    const b=document.createElement('button'); b.className='gmtab'; b.setAttribute('data-gtab',t.id);
+    b.textContent=t.label; b.onclick=()=>switchGTab(t.id); gtabsEl.appendChild(b);
+  });
+
+  const gPanels=document.getElementById('gm-panels'); gPanels.innerHTML='';
+
+  /* ── OVERVIEW panel ── */
+  const ovp=document.createElement('div'); ovp.className='gtpanel'; ovp.id='tab-goverview';
+  ovp.innerHTML=`
+    <div class="msec">
+      <div class="msec-title">Group summary</div>
+      <div class="mstats">
+        <div class="mstat"><div class="mk">Element count</div><div class="mv">${cnt}</div></div>
+        <div class="mstat"><div class="mk">Block</div><div class="mv">${gx.block.toUpperCase()}-block</div></div>
+        <div class="mstat"><div class="mk">Periods</div><div class="mv">${gx.periods}</div></div>
+        <div class="mstat"><div class="mk">Valence electrons</div><div class="mv">${gx.valence_e}</div></div>
+        <div class="mstat"><div class="mk">Typical charge</div><div class="mv">${gx.charge}</div></div>
+        <div class="mstat"><div class="mk">Bonding type</div><div class="mv" style="font-size:11px">${g.bond}</div></div>
+      </div>
+    </div>
+    <div class="msec">
+      <div class="msec-title">Group description</div>
+      <div class="m-fact" style="border-color:${g.br};font-size:12px;line-height:1.8">${g.desc}</div>
+    </div>
+    <div class="msec">
+      <div class="msec-title">Physical characteristics</div>
+      <div class="mprops">
+        <div class="mprop"><span class="pk">Melting points</span><span class="pv">${gx.melting}</span></div>
+        <div class="mprop"><span class="pk">Density range</span><span class="pv">${gx.density}</span></div>
+        <div class="mprop"><span class="pk">Electronegativity</span><span class="pv">${gx.electronegativity}</span></div>
+        <div class="mprop"><span class="pk">Hardness</span><span class="pv">${gx.hardness}</span></div>
+      </div>
+    </div>
+    ${Object.keys(gx.color_flame||{}).length?`
+    <div class="msec">
+      <div class="msec-title">Flame test colours</div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px">
+        ${Object.entries(gx.color_flame).map(([sym,col])=>
+          `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 12px;font-size:11px">
+            <span style="font-size:13px;font-weight:500;color:${g.tx};margin-right:6px">${sym}</span>
+            <span style="color:var(--text2)">${col||'—'}</span>
+          </div>`
+        ).join('')}
+      </div>
+    </div>`:''}
+  `;
+  gPanels.appendChild(ovp);
+
+  /* ── ELEMENTS panel ── */
+  const elp=document.createElement('div'); elp.className='gtpanel'; elp.id='tab-gelements';
+  const gelCards=els.map(el=>`
+    <div class="gel-card" style="background:${g.bg};border-color:${g.br};color:${g.tx}" title="${el[2]}" onclick="closeGroupModal();openModal(${el[0]},'details')">
+      <div class="gel-z">${el[0]}</div>
+      <div class="gel-sym">${el[1]}</div>
+      <div class="gel-name">${el[2]}</div>
+    </div>
+  `).join('');
+  elp.innerHTML=`
+    <div class="msec">
+      <div class="msec-title">All ${cnt} elements in this group</div>
+      <div class="gel-grid">${gelCards}</div>
+    </div>
+    <div class="msec">
+      <div class="msec-title">Data comparison</div>
+      <div style="overflow-x:auto">
+        <table class="cmp-tbl">
+          <thead><tr>
+            <th>Element</th><th>Z</th><th>Crystal</th><th>Mp (K)</th><th>Bp (K)</th><th>Density</th><th>Ox. states</th><th>χ (EN)</th>
+          </tr></thead>
+          <tbody>
+            ${(gx.comparisons||[]).map(r=>`<tr>
+              <td><span class="cmp-sym" style="color:${g.tx}">${r[1]}</span>${r[2]}</td>
+              <td>${r[0]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td>
+              <td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  gPanels.appendChild(elp);
+
+  /* ── TRENDS panel ── */
+  const trp=document.createElement('div'); trp.className='gtpanel'; trp.id='tab-gtrends';
+  function tBar(lbl,pct,note){
+    return `<div class="trend-row">
+      <span class="trend-lbl">${lbl}</span>
+      <div class="trend-bar"><div class="trend-fill" style="width:${pct}%;background:${g.br}"></div></div>
+      <span class="trend-val">${note}</span>
+    </div>`;
+  }
+  trp.innerHTML=`
+    <div class="msec">
+      <div class="msec-title">Relative property levels (within all groups)</div>
+      <div class="trend-wrap">
+        ${tBar('Reactivity',gx.trend_reactivity,gx.trend_reactivity>=75?'Very high':gx.trend_reactivity>=50?'High':gx.trend_reactivity>=25?'Moderate':'Low')}
+        ${tBar('Melting point',gx.trend_melting,gx.trend_melting>=75?'Very high':gx.trend_melting>=50?'High':gx.trend_melting>=25?'Moderate':'Low')}
+        ${tBar('Density',gx.trend_density,gx.trend_density>=75?'Very high':gx.trend_density>=50?'High':gx.trend_density>=25?'Moderate':'Low')}
+        ${tBar('Electronegativity',gx.trend_en,gx.trend_en>=75?'Very high':gx.trend_en>=50?'High':gx.trend_en>=25?'Moderate':'Low/none')}
+      </div>
+    </div>
+    <div class="msec">
+      <div class="msec-title">Properties in detail</div>
+      <div class="mprops">
+        <div class="mprop"><span class="pk">Typical melting points</span><span class="pv">${gx.melting}</span></div>
+        <div class="mprop"><span class="pk">Density range</span><span class="pv">${gx.density}</span></div>
+        <div class="mprop"><span class="pk">Electronegativity range</span><span class="pv">${gx.electronegativity}</span></div>
+        <div class="mprop"><span class="pk">Hardness</span><span class="pv">${gx.hardness}</span></div>
+        <div class="mprop"><span class="pk">Valence electrons</span><span class="pv">${gx.valence_e}</span></div>
+        <div class="mprop"><span class="pk">Common charge</span><span class="pv">${gx.charge}</span></div>
+        <div class="mprop"><span class="pk">Block</span><span class="pv">${gx.block.toUpperCase()}-block</span></div>
+        <div class="mprop"><span class="pk">Bonding type</span><span class="pv">${g.bond}</span></div>
+      </div>
+    </div>
+  `;
+  gPanels.appendChild(trp);
+
+  /* ── KEY FACTS panel ── */
+  const kfp=document.createElement('div'); kfp.className='gtpanel'; kfp.id='tab-gfacts';
+  const factsHTML=(gx.facts||[]).map(f=>`
+    <div class="kf-item">
+      <div class="kf-bullet" style="background:${g.br}"></div>
+      <div class="kf-text">${f}</div>
+    </div>
+  `).join('');
+  kfp.innerHTML=`
+    <div class="msec">
+      <div class="msec-title">Key facts about ${g.label}</div>
+      <div class="kf-list">${factsHTML}</div>
+    </div>
+    <div class="msec">
+      <div class="msec-title">Group at a glance</div>
+      <div class="m-fact" style="border-color:${g.br}">${g.desc}</div>
+    </div>
+  `;
+  gPanels.appendChild(kfp);
+
+  /* ── GROUP QUIZ panel ── */
+  const gqp=document.createElement('div'); gqp.className='gtpanel'; gqp.id='tab-gquiz';
+  gPanels.appendChild(gqp);
+  if(!gQuizStates[key]) gQuizStates[key]={qIdx:0,score:0,answered:new Array((gx.quiz||[]).length).fill(null),total:(gx.quiz||[]).length};
+  renderGQuiz(key,g,gx.quiz||[],gQuizStates[key],gqp);
+
+  document.getElementById('g-overlay').classList.add('open');
+  gPanels.scrollTop=0;
+  switchGTab(startTab||'goverview');
+}
+
+function switchGTab(id){
+  document.querySelectorAll('.gmtab').forEach(t=>t.classList.toggle('active',t.getAttribute('data-gtab')===id));
+  document.querySelectorAll('.gtpanel').forEach(p=>p.classList.toggle('active',p.id===`tab-${id}`));
+}
+
+function closeGroupModal(){
+  document.getElementById('g-overlay').classList.remove('open');
+}
+
+document.getElementById('g-overlay').addEventListener('click',e=>{
+  if(e.target===document.getElementById('g-overlay')) closeGroupModal();
+});
+
+/* ── Group quiz renderer ── */
+function renderGQuiz(key,g,qs,state,container){
+  container.innerHTML='';
+  if(!qs.length){
+    container.innerHTML=`<div style="padding:30px;text-align:center;color:var(--text2);font-size:12px">No quiz questions for this group yet.</div>`;
+    return;
+  }
+
+  if(state.qIdx>=state.total && state.answered.every(a=>a!==null)){
+    const pct=Math.round((state.score/state.total)*100);
+    const grade=pct>=80?{label:'Excellent!',bg:'rgba(76,175,80,0.15)',col:'#7dd87f'}:pct>=60?{label:'Good work',bg:'rgba(255,193,7,0.12)',col:'#ffd54f'}:{label:'Keep studying!',bg:'rgba(226,85,85,0.12)',col:'#e88888'};
+    container.innerHTML=`
+      <div class="quiz-result show">
+        <div class="result-score" style="color:${g.tx}">${state.score}<span style="font-size:24px;color:var(--text2)">/${state.total}</span></div>
+        <div class="result-label">Quiz complete · <b>${g.label}</b></div>
+        <div class="result-grade" style="background:${grade.bg};color:${grade.col}">${grade.label} — ${pct}%</div>
+        <div class="result-breakdown">
+          <div class="rb-item"><b style="color:#7dd87f">${state.score}</b> correct</div>
+          <div class="rb-item"><b style="color:#e88888">${state.total-state.score}</b> wrong</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <button class="qbtn primary" onclick="gQuizStates['${key}']={qIdx:0,score:0,answered:new Array(${qs.length}).fill(null),total:${qs.length}};renderGQuiz('${key}',GRP['${key}'],GRPX['${key}'].quiz,gQuizStates['${key}'],document.getElementById('tab-gquiz'))">Retry quiz</button>
+          <button class="qbtn" onclick="switchGTab('goverview')">Back to overview</button>
+        </div>
+        <div style="margin-top:16px;width:100%">
+          <div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Review answers</div>
+          ${qs.map((q,i)=>`<div style="padding:9px 0;border-bottom:1px solid var(--border);font-size:11px;display:flex;gap:8px;align-items:flex-start">
+            <span style="color:${state.answered[i]===q.ans?'#7dd87f':'#e88888'};font-size:16px;line-height:1">${state.answered[i]===q.ans?'✓':'✗'}</span>
+            <div><div style="color:var(--text);margin-bottom:3px;line-height:1.5">${q.q}</div><div style="color:var(--text2);font-size:10px">Correct answer: <b>${q.opts[q.ans]}</b></div><div style="color:var(--text3);font-size:10px;margin-top:2px;line-height:1.5">${q.exp}</div></div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    return;
+  }
+
+  const qi=Math.min(state.qIdx,state.total-1);
+  const q=qs[qi];
+  const already=state.answered[qi];
+  const letters=['A','B','C','D'];
+
+  const dotsHTML=qs.map((_,i)=>{
+    const a=state.answered[i];
+    let cls='qs-dot';
+    if(a!==null) cls+=a===qs[i].ans?' done-ok':' done-fail';
+    if(i===qi) return `<div class="${cls}" style="width:10px;height:10px;border:1.5px solid ${g.br}"></div>`;
+    return `<div class="${cls}"></div>`;
+  }).join('');
+
+  container.innerHTML=`
+    <div class="quiz-wrap">
+      <div class="quiz-score-bar">
+        <span class="qs-label">${g.label} · Q${qi+1}/${state.total}</span>
+        <div class="qs-prog">${dotsHTML}</div>
+        <span class="qs-score" style="color:${g.tx}">${state.score}/${state.total}</span>
+      </div>
+      <div class="q-card">
+        <div class="q-num">Question ${qi+1} of ${state.total} — ${g.label}</div>
+        <div class="q-text">${q.q}</div>
+        <div class="q-options" id="gq-opts"></div>
+        <div class="q-feedback" id="gq-fb"></div>
+      </div>
+      <div class="q-nav">
+        <button class="qbtn" id="gqprev" ${qi===0?'disabled':''}>← Prev</button>
+        <button class="qbtn" id="gqskip" ${already!==null?'style="display:none"':''}>Skip</button>
+        <button class="qbtn primary" id="gqnext" ${already===null?'disabled':''}>${qi===state.total-1?'See results':'Next →'}</button>
+      </div>
+    </div>`;
+
+  const optsDiv=document.getElementById('gq-opts');
+  q.opts.forEach((opt,oi)=>{
+    const btn=document.createElement('button'); btn.className='q-opt';
+    btn.innerHTML=`<span class="q-opt-letter">${letters[oi]}</span>${opt}`;
+    if(already!==null){
+      btn.disabled=true;
+      if(oi===q.ans) btn.classList.add(already===q.ans&&oi===already?'correct':'reveal');
+      else if(oi===already&&already!==q.ans) btn.classList.add('wrong');
+    } else {
+      btn.onclick=()=>{
+        const correct=oi===q.ans;
+        if(correct) state.score++;
+        state.answered[qi]=oi;
+        const fb=document.getElementById('gq-fb');
+        fb.innerHTML=`<b>${correct?'Correct!':'Incorrect.'}</b> ${q.exp}`;
+        fb.className=`q-feedback show ${correct?'ok':'fail'}`;
+        document.querySelectorAll('#gq-opts .q-opt').forEach((b,bi)=>{
+          b.disabled=true;
+          if(bi===q.ans) b.classList.add(oi===q.ans?'correct':'reveal');
+          else if(bi===oi&&!correct) b.classList.add('wrong');
+        });
+        document.getElementById('gqnext').disabled=false;
+        document.getElementById('gqskip').style.display='none';
+      };
+    }
+    optsDiv.appendChild(btn);
+  });
+
+  if(already!==null){
+    const fb=document.getElementById('gq-fb');
+    fb.innerHTML=`<b>${already===q.ans?'Correct!':'Incorrect.'}</b> ${q.exp}`;
+    fb.className=`q-feedback show ${already===q.ans?'ok':'fail'}`;
+  }
+
+  document.getElementById('gqprev').onclick=()=>{state.qIdx=Math.max(0,qi-1);renderGQuiz(key,g,qs,state,container);};
+  document.getElementById('gqskip').onclick=()=>{state.answered[qi]=-1;state.qIdx=qi+1;renderGQuiz(key,g,qs,state,container);};
+  document.getElementById('gqnext').onclick=()=>{state.qIdx=qi+1;renderGQuiz(key,g,qs,state,container);};
+}
+
+buildGrid();
+</script>
+</body>
+</html>
