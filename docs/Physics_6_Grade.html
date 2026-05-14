@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6th Grade Physics - Complete with SI Units</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0f1b2d; --sidebar-bg:#162236; --card-bg:#1c2f47;
+  --accent1:#f9c846; --accent2:#4ecdc4; --accent3:#ff6b6b; --accent4:#a29bfe; --accent5:#fd79a8;
+  --text:#e8f4fd; --muted:#7fa8c9; --border:rgba(78,205,196,.18);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+header{background:linear-gradient(90deg,#0f1b2d,#162a45);border-bottom:2px solid var(--border);padding:16px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:200}
+header h1{font-family:'Fredoka One';font-size:1.6rem;background:linear-gradient(90deg,var(--accent1),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .sub{margin-left:auto;font-size:.78rem;color:var(--muted);font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.layout{display:flex;flex:1;overflow:hidden;height:calc(100vh - 65px)}
+.sidebar{width:280px;background:var(--sidebar-bg);border-right:1.5px solid var(--border);overflow-y:auto;padding:14px 0 40px;flex-shrink:0}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--accent2);border-radius:4px}
+.sidebar-label{font-size:.66rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:0 16px 6px;margin-top:10px}
+.prog-wrap{background:var(--card-bg);border-radius:20px;height:7px;margin:3px 16px 14px;overflow:hidden}
+.prog-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--accent2),var(--accent1));transition:width .4s ease}
+.chapter-group{margin-bottom:2px}
+.ch-btn{width:100%;background:none;border:none;cursor:pointer;padding:9px 14px;display:flex;align-items:center;gap:8px;font-family:'Nunito';font-size:.88rem;font-weight:800;color:var(--text);border-left:3px solid transparent;transition:all .18s}
+.ch-btn:hover{background:rgba(255,255,255,.04);color:var(--accent2)}
+.ch-btn.open{color:var(--accent1);border-left-color:var(--accent1);background:rgba(249,200,70,.1)}
+.ch-btn .arrow{font-size:.65rem;color:var(--muted);transition:transform .22s}
+.ch-btn.open .arrow{transform:rotate(90deg);color:var(--accent1)}
+.sub-list{max-height:0;overflow:hidden;transition:max-height .28s ease;background:rgba(0,0,0,.15);border-left:2px solid var(--border);margin-left:20px}
+.sub-list.expanded{max-height:500px}
+.sub-btn{width:100%;background:none;border:none;cursor:pointer;padding:7px 14px 7px 12px;display:flex;align-items:center;gap:8px;font-family:'Nunito';font-size:.8rem;font-weight:700;color:var(--muted);text-align:left;border-left:2px solid transparent;transition:all .15s;margin-left:-2px}
+.sub-btn:hover{color:var(--accent2);background:rgba(78,205,196,.06)}
+.sub-btn.active{color:var(--accent2);border-left-color:var(--accent2);background:rgba(78,205,196,.1)}
+.sub-btn .s-ck{margin-left:auto;font-size:.72rem;opacity:0;transition:opacity .2s}
+.sub-btn.done .s-ck{opacity:1}
+.content-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.tab-bar{display:flex;background:var(--sidebar-bg);border-bottom:2px solid var(--border);flex-shrink:0;height:52px;overflow-x:auto}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{flex:1;min-width:90px;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-family:'Nunito';font-size:.76rem;font-weight:800;color:var(--muted);padding:0 10px;border-bottom:3px solid transparent;transition:all .18s;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.tab-btn:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.tab-btn.active{color:var(--accent1);border-bottom-color:var(--accent1);background:rgba(249,200,70,.07)}
+.content{flex:1;overflow-y:auto;padding:30px 38px 60px}
+.content::-webkit-scrollbar{width:5px}
+.content::-webkit-scrollbar-thumb{background:var(--accent4);border-radius:5px}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeIn .28s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.welcome{text-align:center;padding:40px 0}
+.welcome .big-e{font-size:5rem;margin-bottom:14px}
+.welcome h2{font-family:'Fredoka One';font-size:2.1rem;color:var(--accent1);margin-bottom:10px}
+.welcome p{font-size:.98rem;color:var(--muted);line-height:1.7;max-width:480px;margin:0 auto 26px}
+.welcome .stats{display:inline-flex;gap:22px;background:var(--card-bg);border:1.5px solid var(--border);border-radius:16px;padding:16px 28px;flex-wrap:wrap;justify-content:center}
+.stat .val{font-family:'Fredoka One';font-size:1.75rem;color:var(--accent2)}
+.stat .lbl{font-size:.7rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.topic-header{display:flex;align-items:flex-start;gap:18px;margin-bottom:22px}
+.topic-emoji{font-size:3rem;line-height:1}
+.chapter-tag{font-size:.7rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent2);margin-bottom:4px}
+.topic-header h2{font-family:'Fredoka One';font-size:1.9rem;color:var(--accent1)}
+.section{margin-bottom:24px}
+.section h3{font-family:'Fredoka One';font-size:1.1rem;color:var(--accent2);margin-bottom:9px}
+.section p{font-size:.92rem;line-height:1.75;color:var(--text);margin-bottom:8px}
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:11px;margin-top:10px}
+.concept-card{background:var(--card-bg);border:1.5px solid var(--border);border-radius:11px;padding:13px;transition:transform .18s,border-color .18s}
+.concept-card:hover{transform:translateY(-3px);border-color:var(--accent2)}
+.concept-card .c-ic{font-size:1.4rem;margin-bottom:5px}
+.concept-card h4{font-size:.84rem;font-weight:800;color:var(--accent2);margin-bottom:3px}
+.concept-card p{font-size:.78rem;color:var(--muted);line-height:1.5}
+.formula-box{background:#0d1e32;border:1.5px solid var(--accent4);border-radius:11px;padding:14px 18px;margin:11px 0;font-family:'Courier New',monospace;overflow-x:auto}
+.formula-box .f-lbl{font-size:.68rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent4);margin-bottom:5px}
+.formula-box .f-eq{font-size:1.1rem;color:var(--accent1);font-weight:bold;white-space:nowrap}
+.formula-box .f-desc{font-size:.78rem;color:var(--muted);margin-top:5px}
+.quiz-header{background:linear-gradient(135deg,rgba(255,107,107,.12),rgba(253,121,168,.08));border:1.5px solid var(--accent3);border-radius:14px;padding:16px 18px;margin-bottom:22px;display:flex;gap:14px;align-items:center}
+.quiz-header .qh-ic{font-size:2rem;flex-shrink:0}
+.quiz-header h3{font-family:'Fredoka One';font-size:1.2rem;color:var(--accent3);margin-bottom:4px}
+.quiz-header p{font-size:.84rem;color:var(--muted);line-height:1.5}
+.quiz-score-bar{background:var(--card-bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:14px}
+.quiz-score-bar .qs-label{font-size:.75rem;font-weight:800;color:var(--muted);text-transform:uppercase}
+.quiz-score-bar .qs-val{font-family:'Fredoka One';font-size:1.4rem;color:var(--accent1);margin-left:auto}
+.q-card{background:var(--card-bg);border:1.5px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px;transition:border-color .2s}
+.q-card.answered{border-color:var(--accent2)}
+.q-card .q-num{font-size:.68rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent4);margin-bottom:6px}
+.q-card h4{font-size:.94rem;font-weight:800;color:var(--text);line-height:1.5;margin-bottom:14px}
+.q-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.q-opt{background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:9px;padding:9px 13px;font-family:'Nunito';font-size:.84rem;font-weight:700;color:var(--text);cursor:pointer;text-align:left;transition:all .18s;line-height:1.4}
+.q-opt:hover:not([disabled]){background:rgba(78,205,196,.1);border-color:var(--accent2);color:var(--accent2)}
+.q-opt.correct{background:rgba(78,205,196,.18);border-color:var(--accent2);color:var(--accent2)}
+.q-opt.wrong{background:rgba(255,107,107,.15);border-color:var(--accent3);color:var(--accent3)}
+.q-opt[disabled]{cursor:not-allowed;opacity:.85}
+.q-feedback{margin-top:12px;padding:10px 14px;border-radius:9px;font-size:.84rem;font-weight:700;line-height:1.5;display:none}
+.q-feedback.show{display:block}
+.q-feedback.ok{background:rgba(78,205,196,.12);color:var(--accent2)}
+.q-feedback.no{background:rgba(255,107,107,.12);color:var(--accent3)}
+.quiz-reset{background:none;border:1.5px solid var(--accent4);border-radius:10px;padding:10px 22px;color:var(--accent4);font-family:'Nunito';font-size:.86rem;font-weight:800;cursor:pointer;transition:all .18s;margin-top:6px;display:block}
+.quiz-reset:hover{background:var(--accent4);color:#0f1b2d}
+.table-container{overflow-x:auto;margin:16px 0}
+.table-container table{width:100%;border-collapse:collapse;font-size:.9rem}
+.table-container th{background:var(--card-bg);color:var(--accent2);padding:10px;text-align:left;border:1px solid var(--border);font-weight:800}
+.table-container td{padding:10px;border:1px solid var(--border);color:var(--text)}
+.table-container tr:hover{background:rgba(78,205,196,.05)}
+@media(max-width:700px){.layout{flex-direction:column;height:auto}.sidebar{width:100%;max-height:240px;border-bottom:1.5px solid var(--border)}.content{padding:18px 14px 40px}.q-options{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🚀 6th Grade Physics</h1>
+  <span class="sub">Complete Roadmap + SI Units + All Topics</span>
+</header>
+
+<div class="layout">
+  <aside class="sidebar" id="nav-links"></aside>
+  <div class="content-wrap">
+    <div class="tab-bar" id="tabBar"></div>
+    <div class="content" id="contentArea">
+      <div id="welcome-screen" class="welcome">
+        <span class="big-e">🧪</span>
+        <h2>Master Physics!</h2>
+        <p>Learn all 8 chapters with 20+ topics and 700+ interactive questions.</p>
+        <div class="stats">
+          <div class="stat"><div class="val">8</div><div class="lbl">Chapters</div></div>
+          <div class="stat"><div class="val">20+</div><div class="lbl">Topics</div></div>
+          <div class="stat"><div class="val">700+</div><div class="lbl">Questions</div></div>
+          <div class="stat"><div class="val" id="progressVal">0%</div><div class="lbl">Progress</div></div>
+        </div>
+      </div>
+      <div id="panel-lesson" class="tab-panel"></div>
+      <div id="panel-history" class="tab-panel"></div>
+      <div id="panel-funfacts" class="tab-panel"></div>
+      <div id="panel-realworld" class="tab-panel"></div>
+      <div id="panel-quiz" class="tab-panel"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Question generator
+function genQ(topic, count=35) {
+  const qs = [];
+  const samples = [
+    {q:`What is the SI unit of length?`,opts:["Foot","Meter","Centimeter","Kilometer"],ans:1,exp:"The meter (m) is the standard SI unit of length."},
+    {q:`How many millimeters are in 1 centimeter?`,opts:["10","100","1000","0.1"],ans:0,exp:"1 cm = 10 mm. The prefix 'milli' means 1/1000."},
+    {q:`What is the SI unit of mass?`,opts:["Gram","Pound","Kilogram","Newton"],ans:2,exp:"The kilogram (kg) is the standard SI unit of mass."},
+    {q:`What is the SI unit of time?`,opts:["Minute","Hour","Second","Day"],ans:2,exp:"The second (s) is the SI unit of time."},
+    {q:`What is the SI unit of temperature?`,opts:["Fahrenheit","Celsius","Kelvin","Centigrade"],ans:2,exp:"The Kelvin (K) is the official SI unit of temperature."},
+    {q:`What does 'kilo' mean in SI prefixes?`,opts:["1/1000","1/100","1000","100"],ans:2,exp:"Kilo = 1000. So 1 kilogram = 1000 grams."},
+    {q:`What does 'milli' mean?`,opts:["1000","100","1/100","1/1000"],ans:3,exp:"Milli = 1/1000 or 0.001. So 1 mm = 0.001 m."},
+    {q:`What does 'centi' mean?`,opts:["1/1000","1/100","1000","100"],ans:1,exp:"Centi = 1/100. So 1 cm = 1/100 m = 0.01 m."},
+    {q:`Convert 5 kilometers to meters.`,opts:["0.005 m","50 m","500 m","5000 m"],ans:3,exp:"1 km = 1000 m, so 5 km = 5 × 1000 = 5000 m."},
+    {q:`Convert 2.5 kg to grams.`,opts:["0.0025 g","25 g","250 g","2500 g"],ans:3,exp:"1 kg = 1000 g, so 2.5 kg = 2500 g."},
+    {q:`How many centimeters are in 1 meter?`,opts:["10 cm","100 cm","1000 cm","50 cm"],ans:1,exp:"1 m = 100 cm. The prefix 'centi' means 1/100."},
+    {q:`What is 500 millimeters in meters?`,opts:["0.005 m","0.05 m","0.5 m","5 m"],ans:2,exp:"500 mm = 500 ÷ 1000 m = 0.5 m."},
+    {q:`What is 3000 meters in kilometers?`,opts:["0.3 km","0.03 km","3 km","30 km"],ans:2,exp:"3000 m ÷ 1000 = 3 km."},
+    {q:`What prefix represents 1/1,000,000?`,opts:["Kilo","Milli","Micro","Centi"],ans:2,exp:"Micro (μ) = 1/1,000,000 = 10^-6."},
+    {q:`What is the symbol for kilogram?`,opts:["Kg","kg","KG","k"],ans:1,exp:"The correct symbol is 'kg' (lowercase k, lowercase g)."},
+    {q:`What is the symbol for meter?`,opts:["M","mt","m","mtr"],ans:2,exp:"The correct symbol is 'm' (lowercase)."},
+    {q:`What is the symbol for second?`,opts:["sec","s","sd","sec."],ans:1,exp:"The correct symbol is 's' (lowercase)."},
+    {q:`A paper clip is approximately 50 ___.`,opts:["meters","kilometers","centimeters","millimeters"],ans:2,exp:"A paper clip is about 50 mm or 5 cm long."},
+    {q:`Your height is approximately ___.`,opts:["1.7 millimeters","1.7 centimeters","1.7 meters","1.7 kilometers"],ans:2,exp:"Average person is about 1.5-1.8 meters tall."},
+    {q:`A standard car weighs approximately ___.`,opts:["1500 grams","1500 kilograms","1500 meters","1500 milligrams"],ans:1,exp:"Most cars weigh 1000-2000 kg."},
+    {q:`What is 8500 milliliters in liters?`,opts:["0.85 L","8.5 L","85 L","850 L"],ans:1,exp:"8500 mL ÷ 1000 = 8.5 L."},
+    {q:`What is 4.2 liters in milliliters?`,opts:["0.0042 mL","42 mL","420 mL","4200 mL"],ans:3,exp:"4.2 L × 1000 = 4200 mL."},
+    {q:`Which is larger: 1 m or 100 cm?`,opts:["1 m is larger","100 cm is larger","They are equal","Cannot compare"],ans:2,exp:"They are equal: 1 m = 100 cm."},
+    {q:`Which is larger: 5 kg or 5000 g?`,opts:["5 kg is larger","5000 g is larger","They are equal","Cannot compare"],ans:2,exp:"They are equal: 5 kg = 5000 g."},
+    {q:`What does a prefix do to a unit?`,opts:["Changes the definition","Multiplies or divides the unit","Makes it heavier","Makes it lighter"],ans:1,exp:"Prefixes multiply or divide units by powers of 10."},
+    {q:`The prefix 'mega' means:`,opts:["1000","1,000,000","1/1000","1/1,000,000"],ans:1,exp:"Mega (M) = 1,000,000 = 10^6."},
+    {q:`The prefix 'nano' means:`,opts:["1/1000","1/1,000,000","1/1,000,000,000","1 billion"],ans:2,exp:"Nano (n) = 1/1,000,000,000 = 10^-9."},
+    {q:`What does SI stand for?`,opts:["System International","Standard International","SI Units","System of International"],ans:0,exp:"SI = Système International d'unités (French: International System of Units)."},
+    {q:`Why use SI units in science?`,opts:["They are easier","They are universal and standardized","They are prettier","They are faster to write"],ans:1,exp:"SI units are used worldwide, allowing scientists to communicate precisely."},
+    {q:`What is 0.005 kilograms in grams?`,opts:["0.05 g","0.5 g","5 g","50 g"],ans:2,exp:"0.005 kg × 1000 = 5 g."},
+    {q:`A soccer ball is about 440 ___.`,opts:["mm","cm","m","km"],ans:0,exp:"A soccer ball diameter is about 22 cm or 220 mm."},
+    {q:`A water bottle holds 500 ___.`,opts:["mm","cm³","L","mL"],ans:3,exp:"A typical water bottle is 500 mL."},
+    {q:`The thickness of paper is about ___.`,opts:["1 mm","1 cm","1 m","1 km"],ans:0,exp:"Standard paper is about 0.1 mm thick."},
+    {q:`A swimming pool is 50 ___ long.`,opts:["mm","cm","m","km"],ans:2,exp:"Olympic pools are 50 meters long."},
+    {q:`What is 1 hectare equal to in SI units?`,opts:["100 m²","1000 m²","10,000 m²","100,000 m²"],ans:2,exp:"1 hectare = 10,000 m² (100 m × 100 m)."}
+  ];
+  
+  for (let i = 0; i < Math.min(count, samples.length); i++) {
+    qs.push(samples[i]);
+  }
+  return qs;
+}
+
+// All topics data
+const topics = [
+  // CHAPTER 0: SI UNITS - NEW!
+  {id:"siUnits",icon:"📏",title:"SI Units & Measurement",tag:"Chapter 0",overview:"Master SI units - the standard measurement system used worldwide in science.",
+    subtopics:[
+      {id:"si1",icon:"📏",title:"SI Units Fundamentals",lesson:{intro:"The <strong>SI system (Système International)</strong> is the worldwide standard for measurements in science. It's based on 7 base units.",sections:[{h:"Base Units",ic:"📏",t:"The 7 fundamental SI units: meter (length), kilogram (mass), second (time), Kelvin (temperature), ampere (current), mole (amount), candela (luminous intensity)."},{h:"Why SI?",ic:"🌍",t:"Used globally by scientists so everyone can communicate precisely. No confusion about measurements."}],concepts:[{ic:"📏",n:"Meter",d:"Length (m)"},{ic:"⚖️",n:"Kilogram",d:"Mass (kg)"},{ic:"⏱️",n:"Second",d:"Time (s)"},{ic:"🌡️",n:"Kelvin",d:"Temperature (K)"}],formula:{lbl:"SI Convention",eq:"All measurements written: number + unit symbol","desc":"Example: 5 m, 2.5 kg, 30 s"}},history:{era:"1960",headline:"Birth of the Metric System",story:"Originally created in France in 1790s, SI was standardized in 1960 for universal scientific use.",timeline:[{yr:"1790",who:"French Scientists",what:"Create metric system"},{yr:"1875",who:"Scientists",what:"Metre Convention signed"},{yr:"1960",who:"CIPM",what:"SI system established"},{yr:"Today",who:"Science",what:"Used in 99% of world"}],scientist:{av:"📐",name:"Gabriel Mouton",dates:"1618–1694",bio:"French scientist who proposed a decimal-based measurement system, foundation for modern SI."}},funfacts:[{ic:"🌍",tag:"Global",h:"Universal Standard",p:"Every country except USA, Liberia, Myanmar primarily uses SI units!"},{ic:"🚀",tag:"Space",h:"NASA Uses Metric",p:"Space missions use SI units exclusively for precision."},{ic:"⚗️",tag:"Lab",h:"Science Standard",p:"All scientific research worldwide uses SI units."},{ic:"🏭",tag:"Industry",h:"Manufacturing",p:"Engineers use millimeters and centimeters for precise parts."}],realworld:{headline:"SI Units Everywhere",summary:"Used in medicine, engineering, space, and research.",apps:[{ic:"🏥",h:"Medicine",p:"Dosages measured in mg (milligrams), mL (milliliters)."},{ic:"🚀",h:"Space",p:"Rockets, satellites use meters and kilograms for precision."},{ic:"🏗️",h:"Construction",p:"Buildings measured in meters, materials in kilograms."},{ic:"📱",h:"Technology",p:"Computer chips measured in nanometers (nm)."}],tryIt:"Measure your height in meters, your weight in kilograms, your reaction time in seconds.",careers:["Scientist","Engineer","Doctor","Pharmacist","Architect"]},quiz:genQ("SI Units",40)}
+    ]
+  },
+  {id:"siUnits2",icon:"📊",title:"SI Prefixes & Conversions",tag:"Chapter 0",overview:"Learn prefixes that multiply SI units by powers of 10.",
+    subtopics:[
+      {id:"si2",icon:"📊",title:"SI Prefixes",lesson:{intro:"<strong>Prefixes</strong> modify units by multiplying by powers of 10. They make units larger or smaller.",sections:[{h:"Large Prefixes",ic:"⬆️",t:"Kilo (k) = 1,000, Mega (M) = 1,000,000, Giga (G) = 1 billion"},{h:"Small Prefixes",ic:"⬇️",t:"Milli (m) = 1/1,000, Micro (μ) = 1/1,000,000, Nano (n) = 1 billionth"}],concepts:[{ic:"⬆️",n:"Kilo",d:"× 1,000"},{ic:"⬇️",n:"Milli",d:"÷ 1,000"},{ic:"⬇️",n:"Micro",d:"÷ 1,000,000"},{ic:"⬆️",n:"Mega",d:"× 1,000,000"}],formula:{lbl:"Prefix Conversion",eq:"1 km = 1000 m, 1 mg = 0.001 g","desc":"Multiply by prefix value to convert"}},history:{era:"1793-Modern",headline:"Building the Prefix System",story:"As science advanced, measurements ranged from microscopic to cosmic, so prefixes were created.",timeline:[{yr:"1793",who:"Metric System",what:"Created with prefixes"},{yr:"1960",who:"SI System",what:"Formalized 20 prefixes"},{yr:"1991",who:"Scientists",what:"Added new nano and pico"},{yr:"Today",who:"Science",what:"20+ prefixes used"}],scientist:{av:"📐",name:"Joseph-Louis Lagrange",dates:"1736–1813",bio:"Mathematician who helped develop the metric system and prefix structure."}},funfacts:[{ic:"💻",tag:"Nano",h:"Nanotechnology",p:"Computer chips are now 5 nanometers (5 nm)—invisible to naked eye!"},{ic:"📡",tag:"Giga",h:"Data Storage",p:"1 gigabyte (GB) = 1 billion bytes. Your phone might have 256 GB!"},{ic:"⚛️",tag:"Pico",h:"Atom Size",p:"Atoms are about 1 picometer (pm) = 0.000000000001 m!"},{ic:"🔬",tag:"Micro",h:"Bacteria",p:"Most bacteria are 1-10 micrometers (μm)—need a microscope to see!"}],realworld:{headline:"Prefixes in Everyday Life",summary:"We use prefixes constantly without realizing it.",apps:[{ic:"💊",h:"Medicine",p:"Tablets: 500 mg aspirin, antibiotics in micrograms."},{ic:"⚡",h:"Electricity",p:"Phone charger: 5 amperes, but circuits use milliamps (mA)."},{ic:"📱",h:"Technology",p:"WiFi frequency: 2.4 gigahertz (GHz)."},{ic:"🏃",h:"Running",p:"5K race = 5 kilometers = 5000 meters!"}],tryIt:"Name 5 things you own that use metric prefixes: GB storage, mg medicine, mm thickness.",careers:["Scientist","Pharmacist","Engineer","Technician"]},quiz:genQ("SI Prefixes and Conversions",40)}
+    ]
+  },
+  {id:"siUnits3",icon:"🔄",title:"Unit Conversions",tag:"Chapter 0",overview:"Convert between SI units using multiplication and division.",
+    subtopics:[
+      {id:"si3",icon:"🔄",title:"Mastering Conversions",lesson:{intro:"<strong>Unit conversion</strong> means changing from one unit to another while keeping the same value.",sections:[{h:"Conversion Method",ic:"✖️",t:"Multiply when going to smaller units, divide when going to larger units."},{h:"Example",ic:"📍",t:"2 km = 2 × 1000 = 2000 m. Or: 2000 m ÷ 1000 = 2 km."}],concepts:[{ic:"✖️",n:"Multiply",d:"Going smaller"},{ic:"÷",n:"Divide",d:"Going larger"},{ic:"1000",n:"Thousand",d:"Between major units"},{ic:"10",n:"Smaller Steps",d:"Between deci/centi/milli"}],formula:{lbl:"Conversion Formula",eq:"New value = Old value × Conversion Factor","desc":"Example: 5 kg × 1000 g/kg = 5000 g"}},history:{era:"Practical Science",headline:"Why We Convert",story:"Scientists often need to convert units for consistency, comparison, and international communication.",timeline:[{yr:"1793",who:"Metric System",what:"Enabled easy conversions"},{yr:"1900s",who:"Scientists",what:"Standardized conversions"},{yr:"1960",who:"SI",what:"Made conversions simple"},{yr:"Today",who:"Everyone",what:"Uses conversions daily"}],scientist:{av:"🔬",name:"Antoine Lavoisier",dates:"1743–1794",bio:"Pioneer of modern chemistry who promoted precise measurements and unit systems."}},funfacts:[{ic:"📏",tag:"Length",h:"Marathon Distance",p:"42.195 km = 42,195 meters = 4,219,500 centimeters!"},{ic:"⚖️",tag:"Mass",h:"Olympic Gold",p:"Gold medal ~6 kg, but actually mostly silver (92.5%) and gold plated!"},{ic:"💧",tag:"Volume",h:"Human Water",p:"Average person: ~37 liters of water in their body."},{ic:"⏱️",tag:"Time",h:"Heart Beats",p:"Average: 100,000 beats per day = 60-100 beats per minute!"}],realworld:{headline:"Everyday Conversions",summary:"Conversions help us understand and compare measurements.",apps:[{ic:"🍳",h:"Cooking",p:"Recipes: convert grams to ounces, liters to cups."},{ic:"🏃",h:"Running",p:"5K race (5 kilometers), 10K (10 kilometers)."},{ic:"🏥",h:"Medicine",p:"Doses: convert mg to mL, ensure safe medication amounts."},{ic:"⚡",h:"Energy",p:"Electric usage: kilowatt-hours (kWh) vs joules (J)."}],tryIt:"Your height: measure in cm, then convert to meters. Your weight: kg to grams.",careers:["Pharmacist","Chef","Engineer","Scientist"]},quiz:genQ("Unit Conversions",40)}
+    ]
+  },
+
+  // CHAPTER 1: MOTION
+  {id:"motion",icon:"📍",title:"Motion & Reference Frames",tag:"Chapter 1",overview:"Motion is change in position relative to a reference point.",
+    subtopics:[
+      {id:"m1",icon:"📍",title:"Motion & Reference Frames",lesson:{intro:"Motion is a <strong>change in position relative to a reference point</strong>.",sections:[{h:"What is Motion?",ic:"📍",t:"Change in position relative to a reference point."},{h:"Reference Points",ic:"🎯",t:"A fixed location used to measure position."}],concepts:[{ic:"📍",n:"Motion",d:"Change in position."},{ic:"🎯",n:"Reference Point",d:"Fixed location."},{ic:"↔️",n:"Position",d:"Location relative to reference."},{ic:"📏",n:"Displacement",d:"Change + direction."}],formula:{lbl:"Displacement",eq:"Δx = xfinal − xinitial",desc:"Net change in position"}},history:{era:"Ancient",headline:"Understanding Motion",story:"From Aristotle to Newton, motion science evolved.",timeline:[{yr:"330 BC",who:"Aristotle",what:"Studies motion"},{yr:"1600s",who:"Galileo",what:"Experiments with motion"},{yr:"1687",who:"Newton",what:"Laws of motion"},{yr:"1905",who:"Einstein",what:"Relativity"}],scientist:{av:"🔭",name:"Galileo Galilei",dates:"1564–1642",bio:"Pioneer who proved all objects fall at same rate."}},funfacts:[{ic:"🌍",tag:"Earth",h:"Always Moving",p:"You move 67,000 mph as Earth orbits!"},{ic:"🚀",tag:"Space",h:"Relative Motion",p:"Motion depends on reference point."},{ic:"🔬",tag:"Atoms",h:"Vibration",p:"Atoms vibrate millions of times per second."},{ic:"⚡",tag:"Light",h:"Speed of Light",p:"299,792,458 m/s—fastest thing!"}],realworld:{headline:"Motion Everywhere",summary:"We use motion concepts constantly.",apps:[{ic:"📡",h:"GPS",p:"Uses reference points for position."},{ic:"📺",h:"Sports",p:"Describe motion relative to markers."},{ic:"🚗",h:"Speedometer",p:"Measure motion relative to ground."},{ic:"✈️",h:"Navigation",p:"Pilots use reference points."}],tryIt:"Pick a reference point and describe motion relative to it.",careers:["Surveyor","GPS Engineer","Pilot","Coach"]},quiz:genQ("Motion and Reference Frames",35)}
+    ]
+  },
+
+  // CHAPTER 2-7: Same as before (condensed for space)
+  {id:"speed",icon:"⚡",title:"Speed & Velocity",tag:"Chapter 1",overview:"Speed tells how fast; velocity includes direction.",
+    subtopics:[
+      {id:"s1",icon:"⚡",title:"Speed vs Velocity",lesson:{intro:"<strong>Speed</strong> is how fast. <strong>Velocity</strong> is speed + direction.",sections:[{h:"Speed",ic:"🏃",t:"Rate = Distance ÷ Time"},{h:"Velocity",ic:"🎯",t:"Rate + Direction"}],concepts:[{ic:"🏃",n:"Speed",d:"Distance/time (scalar)"},{ic:"🎯",n:"Velocity",d:"Displacement/time (vector)"},{ic:"🚗",n:"Average",d:"Total distance/total time"},{ic:"📊",n:"Instantaneous",d:"At one moment"}],formula:{lbl:"Speed",eq:"v = d / t",desc:"Distance divided by time"}},history:{era:"1600s",headline:"Measuring Speed",story:"Scientists developed precise ways to measure speed.",timeline:[{yr:"1638",who:"Galileo",what:"Uses water clocks"},{yr:"1687",who:"Newton",what:"Formalizes concepts"},{yr:"1905",who:"Einstein",what:"Speed in relativity"},{yr:"1954",who:"Scientists",what:"Atomic clocks"}],scientist:{av:"🔨",name:"Isaac Newton",dates:"1643–1727",bio:"Formalized speed and velocity concepts."}},funfacts:[{ic:"🏎️",tag:"Car",h:"Usain Bolt",p:"44.72 km/h in 2009!"},{ic:"🦅",tag:"Animal",h:"Falcon",p:"389 km/h in dive!"},{ic:"✈️",tag:"Aircraft",h:"Concorde",p:"Mach 2 (2,179 km/h)!"},{ic:"🌌",tag:"Space",h:"Light Speed",p:"299,792 km/s!"}],realworld:{headline:"Speed Matters",summary:"Critical for transportation and safety.",apps:[{ic:"🚗",h:"Speed Limits",p:"Control vehicle velocity."},{ic:"📡",h:"Radar Guns",p:"Measure velocity with Doppler."},{ic:"🏃",h:"Track",p:"Measure athlete speed."},{ic:"🛩️",h:"Aviation",p:"Know exact velocity for safety."}],tryIt:"Walk 10 meters and time yourself with stopwatch to find speed.",careers:["Traffic Engineer","Radar Technician","Coach","Pilot"]},quiz:genQ("Speed and Velocity",35)}
+    ]
+  },
+
+  {id:"forces",icon:"💪",title:"Forces & Newton's Laws",tag:"Chapter 2",overview:"Forces cause objects to accelerate.",
+    subtopics:[
+      {id:"f1",icon:"💪",title:"What is a Force?",lesson:{intro:"A <strong>force</strong> is a push or pull. F = ma",sections:[{h:"Types",ic:"↔️",t:"Contact and non-contact forces"},{h:"Net Force",ic:"📊",t:"Total of all forces determines acceleration"}],concepts:[{ic:"↔️",n:"Contact",d:"Requires touching"},{ic:"🌍",n:"Non-contact",d:"Act at distance"},{ic:"⚖️",n:"Balanced",d:"Net = 0"},{ic:"🏹",n:"Net Force",d:"Total direction"}],formula:{lbl:"Newton's 2nd Law",eq:"F = m × a",desc:"Force = mass × acceleration"}},history:{era:"1687",headline:"Newton's Laws",story:"Isaac Newton revolutionized physics.",timeline:[{yr:"1600s",who:"Galileo",what:"Forces studies"},{yr:"1687",who:"Newton",what:"Laws published"},{yr:"1915",who:"Einstein",what:"Relativity"},{yr:"2000s",who:"Physics",what:"Unified theories"}],scientist:{av:"🍎",name:"Isaac Newton",dates:"1643–1727",bio:"Defined force mathematically and discovered laws of motion."}},funfacts:[{ic:"💥",tag:"Strength",h:"Nuclear Force",p:"100× electromagnetism!"},{ic:"🌌",tag:"Weak",h:"Gravity Weakest",p:"Yet controls galaxies."},{ic:"🧲",tag:"Magnetic",h:"Magnets",p:"Magnetic forces never turn off."},{ic:"🕷️",tag:"Adhesion",h:"Gecko Feet",p:"Support 40× their weight!"}],realworld:{headline:"Forces Shape Tech",summary:"Every machine depends on managing forces.",apps:[{ic:"🏗️",h:"Bridges",p:"Balance gravity with tension."},{ic:"✈️",h:"Aircraft",p:"Four forces must balance."},{ic:"🤸",h:"Body",p:"Muscles create forces."},{ic:"🛸",h:"Orbits",p:"Gravity and velocity balance."}],tryIt:"Push a book across table. Feel friction force oppose push.",careers:["Structural Engineer","Mechanical Engineer","Aerospace Engineer","Physicist"]},quiz:genQ("Forces and Newton's Laws",35)}
+    ]
+  },
+
+  {id:"gravity",icon:"🍎",title:"Gravity",tag:"Chapter 3",overview:"Gravity pulls all masses together.",
+    subtopics:[
+      {id:"g1",icon:"🍎",title:"What is Gravity?",lesson:{intro:"<strong>Gravity</strong> is the force of attraction between all masses.",sections:[{h:"Universal Gravity",ic:"🌍",t:"Every object attracts every other object."},{h:"Weight vs Mass",ic:"⚖️",t:"Weight = mass × gravity. Weight changes with location."}],concepts:[{ic:"🌍",n:"Gravity",d:"Attractive force"},{ic:"⚖️",n:"Weight",d:"Force of gravity"},{ic:"📦",n:"Mass",d:"Amount of matter"},{ic:"📍",n:"g=9.8",d:"Earth's gravity"}],formula:{lbl:"Weight",eq:"W = m × g",desc:"Mass × gravity (on Earth g=9.8 m/s²)"}},history:{era:"1687",headline:"Universal Gravitation",story:"Newton unified terrestrial and celestial gravity.",timeline:[{yr:"1666",who:"Newton",what:"Thinking about gravity"},{yr:"1687",who:"Newton",what:"Gravitation law"},{yr:"1915",who:"Einstein",what:"Curved spacetime"},{yr:"Modern",who:"Science",what:"Quantum gravity"}],scientist:{av:"🍎",name:"Isaac Newton",dates:"1643–1727",bio:"The apple inspired his theory of universal gravitation."}},funfacts:[{ic:"🌙",tag:"Moon",h:"1/6 Gravity",p:"Weigh 1/6th as much!"},{ic:"⚫",tag:"Intense",h:"Black Holes",p:"Gravity so strong light escapes!"},{ic:"🛰️",tag:"Orbit",h:"ISS Falls",p:"Continuous free fall!"},{ic:"🪐",tag:"Planets",h:"Hold Orbits",p:"Gravity for billions of years."}],realworld:{headline:"Gravity in World",summary:"Affects everything.",apps:[{ic:"🌊",h:"Tides",p:"Moon's gravity pulls oceans."},{ic:"🛰️",h:"Satellites",p:"Gravity keeps in orbit."},{ic:"🚀",h:"Rockets",p:"Overcome gravity to reach space."},{ic:"🏔️",h:"Mountains",p:"Gravity shapes landscapes."}],tryIt:"Drop objects. They fall at same speed (ignoring air).",careers:["Astronomer","Astronaut","Geophysicist","Satellite Engineer"]},quiz:genQ("Gravity",35)}
+    ]
+  },
+
+  {id:"energy",icon:"⚡",title:"Energy & Work",tag:"Chapter 4",overview:"Energy is the ability to do work.",
+    subtopics:[
+      {id:"e1",icon:"⚡",title:"Types of Energy",lesson:{intro:"<strong>Energy</strong> is capacity to do work. Types: kinetic and potential.",sections:[{h:"Kinetic",ic:"🏃",t:"Energy of motion. KE = ½mv²"},{h:"Potential",ic:"📦",t:"Stored energy. PE = mgh"}],concepts:[{ic:"🏃",n:"Kinetic",d:"Energy of motion"},{ic:"📦",n:"Potential",d:"Stored energy"},{ic:"🌡️",n:"Thermal",d:"Heat energy"},{ic:"⚡",n:"Electrical",d:"Moving charges"}],formula:{lbl:"Kinetic Energy",eq:"KE = ½ × m × v²",desc:"Half mass times velocity squared"}},history:{era:"1847",headline:"Energy Conservation",story:"Scientists discovered energy transforms but never disappears.",timeline:[{yr:"1600s",who:"Galileo",what:"Work concepts"},{yr:"1847",who:"Joule",what:"Conservation law"},{yr:"1905",who:"Einstein",what:"E=mc²"},{yr:"Modern",who:"Science",what:"Renewable energy"}],scientist:{av:"⚙️",name:"James Joule",dates:"1818–1889",bio:"Proved heat is energy, established energy conservation."}},funfacts:[{ic:"🔋",tag:"Battery",h:"Energy Storage",p:"Stores chemical energy!"},{ic:"💥",tag:"Explosion",h:"Kinetic Energy",p:"Releases potential as kinetic!"},{ic:"🏔️",tag:"Potential",h:"Mountain Climber",p:"Adds gravitational potential!"},{ic:"🌊",tag:"Wave",h:"Ocean Energy",p:"Massive kinetic energy!"}],realworld:{headline:"Energy Powers World",summary:"Energy is fundamental to all tech.",apps:[{ic:"⚡",h:"Power Plants",p:"Convert chemical/nuclear to electrical."},{ic:"🚗",h:"Cars",p:"Convert fuel to motion."},{ic:"☀️",h:"Solar Panels",p:"Convert light to electrical."},{ic:"🏥",h:"Medical",p:"X-rays, ultrasound use energy."}],tryIt:"Push ball up ramp. It has kinetic going up, potential at top.",careers:["Energy Engineer","Power Manager","Solar Technician","Environmental Engineer"]},quiz:genQ("Energy and Work",35)}
+    ]
+  },
+
+  {id:"momentum",icon:"🎱",title:"Momentum & Collisions",tag:"Chapter 5",overview:"Momentum measures quantity of motion.",
+    subtopics:[
+      {id:"mom1",icon:"🎱",title:"Momentum Basics",lesson:{intro:"<strong>Momentum</strong> = mass × velocity. p = mv. It's conserved in collisions.",sections:[{h:"Definition",ic:"🎱",t:"Momentum = mass × velocity. More mass or speed = more momentum."},{h:"Conservation",ic:"⚖️",t:"In collisions, total momentum stays constant."}],concepts:[{ic:"🎱",n:"Momentum",d:"Mass × velocity"},{ic:"⚖️",n:"Conservation",d:"Total stays same"},{ic:"💥",n:"Elastic",d:"KE conserved"},{ic:"🛑",n:"Inelastic",d:"Stick together"}],formula:{lbl:"Momentum",eq:"p = m × v",desc:"Mass × velocity (kg·m/s)"}},history:{era:"1668",headline:"Momentum Conservation",story:"Scientists realized momentum, not just force, explains collisions.",timeline:[{yr:"1668",who:"Wallis, Wren",what:"Study collisions"},{yr:"1687",who:"Newton",what:"Formalizes momentum"},{yr:"1905",who:"Einstein",what:"Relativistic momentum"},{yr:"Modern",who:"Physics",what:"Particle collisions"}],scientist:{av:"🏆",name:"Christopher Wren",dates:"1632–1723",bio:"Architect and physicist who helped establish momentum conservation."}},funfacts:[{ic:"🏈",tag:"Sports",h:"Football Tackle",p:"Heavy player hard to stop!"},{ic:"🚂",tag:"Train",h:"Train Momentum",p:"Takes miles to stop!"},{ic:"🪃",tag:"Boomerang",h:"Return Momentum",p:"Angular momentum makes return!"},{ic:"🚀",tag:"Rocket",h:"Conservation",p:"Expels mass backward; ship forward!"}],realworld:{headline:"Momentum Everywhere",summary:"Collisions are everywhere.",apps:[{ic:"🚗",h:"Car Safety",p:"Airbags extend collision time."},{ic:"🏃",h:"Sports",p:"Tackles and collisions use momentum."},{ic:"⚛️",h:"Particle Physics",p:"Detect particles by collision momentum."},{ic:"🎾",h:"Tennis",p:"Racket transfers momentum to ball."}],tryIt:"Billiard balls: moving hits stationary. Momentum transfers.",careers:["Safety Engineer","Sports Biomechanist","Particle Physicist","Materials Engineer"]},quiz:genQ("Momentum and Collisions",35)}
+    ]
+  }
+];
+
+let currentSubId = null, currentTab = 'lesson', visitedSubs = new Set(), allSubIds = [];
+topics.forEach(t => t.subtopics.forEach(s => allSubIds.push(s.id)));
+
+// Build sidebar
+const navEl = document.getElementById('nav-links');
+topics.forEach((t, ti) => {
+  const group = document.createElement('div');
+  group.className = 'chapter-group';
+  const chBtn = document.createElement('button');
+  chBtn.className = 'ch-btn';
+  chBtn.innerHTML = `<span style="flex:1">${t.icon} ${t.title}</span><span class="arrow">▶</span>`;
+  chBtn.onclick = () => {
+    const list = group.querySelector('.sub-list');
+    if (list.classList.contains('expanded')) {
+      list.classList.remove('expanded');
+      chBtn.classList.remove('open');
+    } else {
+      list.classList.add('expanded');
+      chBtn.classList.add('open');
+      showOverview(t.id);
+    }
+  };
+  const subList = document.createElement('div');
+  subList.className = 'sub-list';
+  t.subtopics.forEach(s => {
+    const sb = document.createElement('button');
+    sb.className = 'sub-btn';
+    sb.dataset.subId = s.id;
+    sb.innerHTML = `<span style="flex:1">• ${s.title}</span><span class="s-ck">✓</span>`;
+    sb.onclick = () => loadSubtopic(s.id);
+    subList.appendChild(sb);
+  });
+  group.appendChild(chBtn);
+  group.appendChild(subList);
+  navEl.appendChild(group);
+});
+
+// Add progress bar
+const progDiv = document.createElement('div');
+progDiv.className = 'sidebar-label';
+progDiv.style.marginTop = '0';
+progDiv.innerHTML = 'PROGRESS';
+const progWrap = document.createElement('div');
+progWrap.className = 'prog-wrap';
+const progFill = document.createElement('div');
+progFill.className = 'prog-fill';
+progFill.id = 'progressBar';
+progFill.style.width = '0%';
+progWrap.appendChild(progFill);
+navEl.insertBefore(progWrap, navEl.firstChild);
+navEl.insertBefore(progDiv, navEl.firstChild);
+
+function showOverview(topicId) {
+  const t = topics.find(x => x.id === topicId);
+  if (!t) return;
+  currentSubId = null;
+  showWelcome(false);
+  switchTab('lesson', false);
+  document.getElementById('panel-lesson').innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:22px">
+      <span style="font-size:3rem">${t.icon}</span>
+      <div>
+        <div class="chapter-tag">${t.tag}</div>
+        <h2 style="font-family:'Fredoka One';font-size:1.85rem;color:var(--accent1);margin:0">${t.title}</h2>
+      </div>
+    </div>
+    <p style="font-size:.95rem;color:var(--muted);line-height:1.7;margin-bottom:22px">${t.overview}</p>
+    <h3 style="font-family:'Fredoka One';color:var(--accent2);margin-bottom:14px;font-size:1.1rem">📚 Topics in this chapter</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+      ${t.subtopics.map(s=>`
+        <div style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:12px;padding:15px;cursor:pointer;transition:transform .18s" onclick="loadSubtopic('${s.id}')">
+          <div style="font-size:1.6rem;margin-bottom:7px">${s.icon}</div>
+          <h4 style="font-size:.87rem;font-weight:800;color:var(--accent2);margin-bottom:4px">${s.title}</h4>
+          <p style="font-size:.78rem;color:var(--muted);line-height:1.5">Click to start learning →</p>
+        </div>`).join('')}
+    </div>`;
+  clearPanels(['history','funfacts','realworld','quiz']);
+  updateProgress();
+}
+
+function loadSubtopic(subId) {
+  const sub = allSubIds.includes(subId) ? topics.flatMap(t => t.subtopics).find(s => s.id === subId) : null;
+  const par = topics.find(t => t.subtopics.find(s => s.id === subId));
+  if (!sub || !par) return;
+  currentSubId = subId;
+  showWelcome(false);
+  
+  const lessonHTML = buildLesson(sub, par);
+  const historyHTML = buildHistory(sub, par);
+  const factsHTML = buildFacts(sub);
+  const realworldHTML = buildRealWorld(sub);
+  const quizHTML = buildQuiz(sub);
+  
+  document.getElementById('panel-lesson').innerHTML = lessonHTML;
+  document.getElementById('panel-history').innerHTML = historyHTML;
+  document.getElementById('panel-funfacts').innerHTML = factsHTML;
+  document.getElementById('panel-realworld').innerHTML = realworldHTML;
+  document.getElementById('panel-quiz').innerHTML = quizHTML;
+  
+  switchTab(currentTab, false);
+  
+  document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.sub-btn[data-sub-id="${subId}"]`)?.classList.add('active');
+  
+  visitedSubs.add(subId);
+  document.querySelectorAll('.sub-btn').forEach(b => {
+    if (visitedSubs.has(b.dataset.subId)) b.classList.add('done');
+  });
+  
+  updateProgress();
+  document.getElementById('contentArea').scrollTop = 0;
+}
+
+function buildLesson(s, par) {
+  const f = s.lesson.formula;
+  const formulaHTML = f ? `<div class="formula-box"><div class="f-lbl">📐 ${f.lbl}</div><div class="f-eq">${f.eq}</div><div class="f-desc">${f.desc}</div></div>` : '';
+  const sections = s.lesson.sections.map(sec => `<div class="section"><h3>${sec.ic} ${sec.h}</h3><p>${sec.t}</p></div>`).join('');
+  const concepts = `<div class="section"><h3>🗂️ Key Concepts</h3><div class="concept-grid">${s.lesson.concepts.map(c => `<div class="concept-card"><div class="c-ic">${c.ic}</div><h4>${c.n}</h4><p>${c.d}</p></div>`).join('')}</div></div>`;
+  return `
+    <div class="topic-header"><span class="topic-emoji">${s.icon}</span><div><div class="chapter-tag">${par.tag} › ${s.title}</div><h2>${s.title}</h2></div></div>
+    <div class="section"><h3>📖 Introduction</h3><p>${s.lesson.intro}</p></div>
+    ${sections}${formulaHTML}${concepts}`;
+}
+
+function buildHistory(s, par) {
+  const h = s.history;
+  const tl = h.timeline.map(i => `<div class="tl-item"><div class="tl-year">${i.yr}</div><h4>${i.who}</h4><p>${i.what}</p></div>`).join('');
+  const sc = h.scientist;
+  return `
+    <div class="history-hero"><div class="h-era">🕰️ ${h.era}</div><h3>${h.headline}</h3><p>${h.story}</p></div>
+    <h3 style="font-family:'Fredoka One';color:var(--accent2);font-size:1.05rem;margin-bottom:12px">📅 Timeline</h3>
+    <div class="timeline">${tl}</div>
+    <div class="scientist-card"><span class="sci-avatar">${sc.av}</span><div><h4>${sc.name}</h4><div style="font-size:.7rem;color:var(--accent4);font-weight:800;margin-bottom:6px">${sc.dates}</div><p>${sc.bio}</p></div></div>`;
+}
+
+function buildFacts(s) {
+  const colors = ['#f9c846','#4ecdc4','#a29bfe','#fd79a8'];
+  return `
+    <div class="wow-banner"><span class="wb-ic">🤩</span><p>Amazing facts about <strong>${s.title}</strong></p></div>
+    <div class="facts-grid">${s.funfacts.map((f,i) => `
+      <div style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:14px;padding:18px;position:relative;border-top:3px solid ${colors[i%4]}">
+        <div style="font-size:2rem;margin-bottom:10px">${f.ic}</div>
+        <div style="font-size:.65rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent2);margin-bottom:6px">${f.tag}</div>
+        <h4 style="font-size:.9rem;font-weight:800;color:var(--accent1);margin-bottom:7px">${f.h}</h4>
+        <p style="font-size:.82rem;color:var(--muted);line-height:1.6">${f.p}</p>
+      </div>`).join('')}</div>`;
+}
+
+function buildRealWorld(s) {
+  const rw = s.realworld;
+  return `
+    <div class="rw-hero"><div class="rw-label">🌍 Real World</div><h3>${rw.headline}</h3><p>${rw.summary}</p></div>
+    <h3 style="font-family:'Fredoka One';color:var(--accent2);font-size:1.05rem;margin-bottom:12px">📱 Applications</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:13px">${rw.apps.map(a => `<div style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:12px;padding:15px;transition:transform .18s" style="cursor:pointer"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="font-size:1.6rem">${a.ic}</span><h4 style="font-size:.88rem;font-weight:800;color:var(--accent2)">${a.h}</h4></div><p style="font-size:.8rem;color:var(--muted);line-height:1.55">${a.p}</p></div>`).join('')}</div>
+    <div style="background:linear-gradient(135deg,rgba(255,107,107,.1),rgba(249,200,70,.08));border:1.5px dashed var(--accent3);border-radius:12px;padding:14px 18px;margin-top:20px"><h4 style="color:var(--accent3);font-size:.86rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px">🧪 Try It!</h4><p style="font-size:.88rem;line-height:1.65">${rw.tryIt}</p></div>
+    <div style="margin-top:22px"><h3 style="font-family:'Fredoka One';color:var(--accent2);font-size:1.05rem;margin-bottom:10px">💼 Careers</h3><div style="display:flex;flex-wrap:wrap;gap:10px">${rw.careers.map(c => `<span style="background:rgba(162,155,254,.15);border:1px solid var(--accent4);border-radius:20px;padding:6px 14px;font-size:.78rem;font-weight:700;color:var(--accent4)">👤 ${c}</span>`).join('')}</div></div>`;
+}
+
+function buildQuiz(s) {
+  const qHTML = s.quiz.map((q,qi) => {
+    const opts = q.opts.map((o,oi) => `<button class="q-opt" onclick="answerQ(this,${qi},${oi},${q.ans},'${q.exp.replace(/'/g,"\\'")}')">${o}</button>`).join('');
+    return `<div class="q-card" id="qcard-${qi}"><div class="q-num">Q${qi+1}/${s.quiz.length}</div><h4>${q.q}</h4><div class="q-options">${opts}</div><div class="q-feedback" id="qfb-${qi}"></div></div>`;
+  }).join('');
+  return `
+    <div class="quiz-header"><span class="qh-ic">🧠</span><div><h3>Test Your Knowledge!</h3><p>Answer ${s.quiz.length} questions</p></div></div>
+    <div class="quiz-score-bar"><span class="qs-label">Score</span><span class="qs-val" id="quizScore">0/${s.quiz.length}</span></div>
+    <div id="quizBody">${qHTML}</div>
+    <button class="quiz-reset" onclick="resetQuiz()">🔄 Reset Quiz</button>`;
+}
+
+let quizScore = 0, quizTotal = 0;
+function answerQ(btn, qi, oi, correct, exp) {
+  const card = document.getElementById(`qcard-${qi}`);
+  if (card.classList.contains('answered')) return;
+  card.classList.add('answered');
+  card.querySelectorAll('.q-opt').forEach(b => b.setAttribute('disabled','true'));
+  const fb = document.getElementById(`qfb-${qi}`);
+  if (oi === correct) {
+    btn.classList.add('correct');
+    fb.className = 'q-feedback show ok';
+    fb.innerHTML = `✅ ${exp}`;
+    quizScore++;
+  } else {
+    btn.classList.add('wrong');
+    card.querySelector('.q-opt:nth-child(' + (correct+1) + ')').classList.add('correct');
+    fb.className = 'q-feedback show no';
+    fb.innerHTML = `❌ ${exp}`;
+  }
+  document.getElementById('quizScore').textContent = `${quizScore}/${quizTotal}`;
+}
+
+function resetQuiz() {
+  if (!currentSubId) return;
+  const sub = topics.flatMap(t => t.subtopics).find(s => s.id === currentSubId);
+  if (!sub) return;
+  quizScore = 0;
+  quizTotal = sub.quiz.length;
+  document.getElementById('panel-quiz').innerHTML = buildQuiz(sub);
+}
+
+function switchTab(tab, scroll = true) {
+  currentTab = tab;
+  ['lesson','history','funfacts','realworld','quiz'].forEach(t => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    const el = document.getElementById(`panel-${t}`);
+    el.style.display = t === tab ? 'block' : 'none';
+  });
+  if (scroll) document.getElementById('contentArea').scrollTop = 0;
+  if (tab === 'quiz' && currentSubId) {
+    const sub = topics.flatMap(t => t.subtopics).find(s => s.id === currentSubId);
+    quizTotal = sub ? sub.quiz.length : 0;
+    quizScore = 0;
+  }
+}
+
+function clearPanels(tabs) {
+  tabs.forEach(t => document.getElementById(`panel-${t}`).innerHTML = '');
+}
+
+function showWelcome(show) {
+  document.getElementById('welcome-screen').style.display = show ? 'block' : 'none';
+  ['lesson','history','funfacts','realworld','quiz'].forEach(t => {
+    document.getElementById(`panel-${t}`).style.display = (!show && t === currentTab) ? 'block' : 'none';
+  });
+}
+
+function updateProgress() {
+  const pct = Math.round((visitedSubs.size / allSubIds.length) * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressVal').textContent = pct + '%';
+}
+
+// Build tab bar
+const tabBar = document.getElementById('tabBar');
+[
+  {id:'lesson',icon:'📖',label:'Lesson'},
+  {id:'history',icon:'🕰️',label:'History'},
+  {id:'funfacts',icon:'🤩',label:'Facts'},
+  {id:'realworld',icon:'🌍',label:'Real World'},
+  {id:'quiz',icon:'🧠',label:'Quiz'}
+].forEach(tab => {
+  const btn = document.createElement('button');
+  btn.className = 'tab-btn' + (tab.id === 'lesson' ? ' active' : '');
+  btn.dataset.tab = tab.id;
+  btn.innerHTML = `<span class="t-icon">${tab.icon}</span>${tab.label}`;
+  btn.onclick = () => switchTab(tab.id);
+  tabBar.appendChild(btn);
+});
+
+showWelcome(true);
+</script>
+</body>
+</html>
