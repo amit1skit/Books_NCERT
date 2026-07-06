@@ -85,6 +85,9 @@
   .section-details.acc-apply { border-left-color: var(--border-accent); }
   .section-details.acc-practice { border-left-color: #3B8A5A; }
   .section-details.acc-guardrail { border-left-color: #B5540E; }
+  .section-details.acc-learn { border-left-color: #7F77DD; }
+  .section-details.acc-learn a { color: var(--text-accent); text-decoration: none; }
+  .section-details.acc-learn a:hover { text-decoration: underline; }
 
   .snippet-block {
     margin: 0; padding: 12px 14px; background: #1c1e22; color: #d8dae0;
@@ -104,6 +107,22 @@
 
   footer { margin-top: 2.5rem; font-size: 12.5px; color: var(--text-muted); text-align: center; }
   footer a { color: var(--text-accent); }
+
+  .about-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .about-section h2 { font-size: 20px; font-weight: 600; margin: 0 0 10px; }
+  .about-section h3 { font-size: 14.5px; font-weight: 600; margin: 20px 0 10px; color: var(--text-primary); }
+  .about-section p { font-size: 14px; color: var(--text-secondary); line-height: 1.65; margin: 0 0 10px; }
+  .about-index { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 6px; }
+  .about-index li a {
+    display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--radius);
+    color: var(--text-primary); text-decoration: none; font-size: 13.5px; background: var(--surface-1);
+  }
+  .about-index li a:hover { background: var(--surface-2); border: 1px solid var(--border-strong); }
+  .about-index li a span.num {
+    flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; background: var(--bg-accent); color: var(--text-accent);
+    font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center;
+  }
+  .about-meta { font-size: 12.5px; color: var(--text-muted); margin-top: 20px; }
 
   .view-tabs { display: flex; gap: 8px; margin-bottom: 1.25rem; }
   .tab-btn {
@@ -127,41 +146,6 @@
   .detail-panel table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
   .detail-panel th { text-align: left; font-weight: 600; color: var(--text-secondary); padding: 6px 8px; border-bottom: 1px solid var(--border-strong); }
   .detail-panel td { padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
-
-  .flow-controls { display: flex; justify-content: flex-end; margin-bottom: 8px; }
-  .flow-controls button {
-    background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text-primary);
-    padding: 6px 12px; border-radius: var(--radius); cursor: pointer; font-size: 13px; font-family: inherit;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .flow-svg-wrap { background: var(--surface-1); border-radius: 12px; padding: 0.5rem 0; }
-  .flow-node-rect { fill: var(--surface-2); stroke: var(--border-strong); stroke-width: 0.5; }
-  .flow-node-text { fill: var(--text-primary); font-size: 13px; font-weight: 500; }
-  .flow-conn { stroke: var(--border-strong); stroke-width: 1; }
-  .flow-packet { fill: var(--text-accent); animation: flowTravel var(--dur, 9s) linear infinite; }
-  .flow-glow { animation: flowGlow var(--dur, 9s) linear infinite; animation-delay: calc(-1 * var(--dur, 9s) * var(--pct, 0)); }
-  @keyframes flowTravel {
-    0% { transform: translateY(0px); opacity: 0; }
-    2% { opacity: 1; }
-    95% { opacity: 1; }
-    100% { transform: translateY(710px); opacity: 0; }
-  }
-  @keyframes flowGlow {
-    0%, 92%, 100% { fill: var(--surface-2); stroke: var(--border-strong); stroke-width: 0.5; }
-    96% { fill: var(--bg-accent); stroke: var(--border-accent); stroke-width: 1.5; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .flow-packet, .flow-glow { animation: none !important; opacity: 1; }
-  }
-  .flow-svg-wrap.paused .flow-packet, .flow-svg-wrap.paused .flow-glow { animation-play-state: paused !important; }
-
-  .flow-legend { display: flex; flex-direction: column; gap: 12px; margin-top: 1.25rem; }
-  .flow-legend-item { display: flex; gap: 12px; align-items: flex-start; font-size: 13.5px; color: var(--text-secondary); }
-  .flow-legend-item strong { color: var(--text-primary); }
-  .flow-num {
-    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--bg-accent); color: var(--text-accent);
-    font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; margin-top: 1px;
-  }
 </style>
 </head>
 <body>
@@ -175,7 +159,6 @@
   <div class="view-tabs">
     <button class="tab-btn active" id="tab-diagram" onclick="setView('diagram')"><i class="ti ti-sitemap"></i>Diagram view</button>
     <button class="tab-btn" id="tab-steps" onclick="setView('steps')"><i class="ti ti-list-check"></i>Step-by-step view</button>
-    <button class="tab-btn" id="tab-flow" onclick="setView('flow')"><i class="ti ti-player-play"></i>Data flow animation</button>
   </div>
 
   <section id="view-diagram">
@@ -202,52 +185,31 @@
     </div>
   </section>
 
-  <section id="view-flow" style="display:none">
-    <div class="flow-controls">
-      <button id="pauseBtn" onclick="toggleAnim()"><i class="ti ti-player-pause" id="pauseIcon"></i><span id="pauseLabel">Pause animation</span></button>
-    </div>
-    <div class="flow-svg-wrap" id="flowWrap" style="--dur:9s">
-      <svg width="100%" viewBox="0 0 680 800" role="img">
-      <title>Animated visualization of data flowing through the Azure Data Factory pipeline</title>
-      <desc>A blue dot travels down through all ten pipeline layers in a continuous loop, with each layer briefly highlighting as the dot passes through it, illustrating how a batch of data moves from the subscription and source databases through ingestion, the API layer, and CI/CD deployment.</desc>
-      <defs>
-      <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="var(--border-strong)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
-      </defs>
-      <g id="flowLines"></g>
-      <g id="flowNodes"></g>
-      <circle class="flow-packet" cx="340" cy="20" r="6"/>
-      <circle class="flow-packet" cx="340" cy="20" r="6" style="animation-delay: calc(-1 * var(--dur, 9s) * 0.33)"/>
-      <circle class="flow-packet" cx="340" cy="20" r="6" style="animation-delay: calc(-1 * var(--dur, 9s) * 0.66)"/>
-      <text class="svg-ts" x="340" y="756" text-anchor="middle">The dot represents a batch of data moving through the pipeline, end to end</text>
-      </svg>
-    </div>
-    <div class="flow-legend">
-      <div class="flow-legend-item"><span class="flow-num">1</span><div><strong>Source</strong><br>Azure SQL databases (one server, many databases) hold the raw data.</div></div>
-      <div class="flow-legend-item"><span class="flow-num">2</span><div><strong>ADF pipeline</strong><br>Copy Activity pulls from each database via the parameterized Linked Service.</div></div>
-      <div class="flow-legend-item"><span class="flow-num">3</span><div><strong>Curated storage</strong><br>Cleaned, transformed data lands in ADLS Gen2 (or a curated SQL database).</div></div>
-      <div class="flow-legend-item"><span class="flow-num">4</span><div><strong>API layer</strong><br>A Function App (optionally behind API Management) reads the curated data on request.</div></div>
-      <div class="flow-legend-item"><span class="flow-num">5</span><div><strong>Consumers</strong><br>Internal apps, dashboards, or external partners call the API to get data on demand.</div></div>
-    </div>
-  </section>
-
   <footer>Built as a reference guide for standing up ADF pipelines end to end.</footer>
+
+  <section class="about-section">
+    <h2>About this guide</h2>
+    <p>This is a working reference for standing up an end-to-end Azure Data Factory pipeline — from the subscription and resource group, through ingestion of multiple Azure SQL databases, out through a REST API layer, and deployed via Azure DevOps CI/CD. It was put together for a data engineering team building on Azure in a regulated (banking) environment, so each layer also calls out the compliance guardrails worth checking with your InfoSec and risk teams.</p>
+
+    <h3>What's covered</h3>
+    <ul class="about-index" id="aboutIndex"></ul>
+
+    <h3>How to use it</h3>
+    <p><strong>Diagram view</strong> gives you the full reference — click any layer for its complete detail, all in one page you can scan top to bottom. <strong>Step-by-step view</strong> walks through the same content one layer at a time, useful for a guided first read-through or onboarding someone new. Both views pull from the exact same content, so nothing differs between them except how you move through it.</p>
+
+    <h3>A note on the banking guardrails</h3>
+    <p>The guardrails called out in each layer reflect general patterns common in regulated financial environments (segregation of duties, encryption standards, audit retention, network isolation). They're a starting checklist, not a substitute for sign-off from your actual compliance, InfoSec, and risk teams — specific requirements vary by regulator and by your organization's own control framework.</p>
+
+    <p class="about-meta">Reference guide · content and links current as of July 2026 · built for internal use, not an official Microsoft or vendor publication.</p>
+  </section>
 </div>
 
 <script>
 function setView(v) {
   document.getElementById('view-diagram').style.display = v === 'diagram' ? 'block' : 'none';
   document.getElementById('view-steps').style.display = v === 'steps' ? 'block' : 'none';
-  document.getElementById('view-flow').style.display = v === 'flow' ? 'block' : 'none';
   document.getElementById('tab-diagram').classList.toggle('active', v === 'diagram');
   document.getElementById('tab-steps').classList.toggle('active', v === 'steps');
-  document.getElementById('tab-flow').classList.toggle('active', v === 'flow');
-}
-
-function toggleAnim() {
-  const wrap = document.getElementById('flowWrap');
-  const paused = wrap.classList.toggle('paused');
-  document.getElementById('pauseIcon').className = paused ? 'ti ti-player-play' : 'ti ti-player-pause';
-  document.getElementById('pauseLabel').textContent = paused ? 'Play animation' : 'Pause animation';
 }
 
 const layers = [
@@ -284,7 +246,8 @@ az provider show --namespace Microsoft.DataFactory --query "registrationState"`,
     "Segregate Dev/Test/Prod into separate subscriptions, with Conditional Access requiring MFA and a compliant/managed device for any access to the Prod subscription.",
     "Apply a Policy initiative aligned to your bank's control framework (e.g. NIST 800-53 mapping, PCI-DSS scope, or internal InfoSec baseline) before any workload goes live — most banks require this sign-off as a hard gate.",
     "Confirm Microsoft's SOC 2 Type II report and sub-processor documentation are on file with your third-party/vendor risk team — regulators expect documented oversight of cloud sub-processors."
-  ]
+  ],
+  learnMore: { label: "Azure Resource Manager overview (Microsoft Learn)", url: "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/overview" }
 },
 {
   label: "Resource group",
@@ -312,7 +275,8 @@ az provider show --namespace Microsoft.DataFactory --query "registrationState"`,
   guardrails: [
     "Enforce \"deny public network access\" via Policy at this scope for any resource touching customer or account data — treat Private Endpoints as a hard requirement, not optional hardening.",
     "Require dual approval to remove a resource lock (a documented break-glass procedure) — segregation of duties is typically mandatory for any change to production infrastructure at a bank."
-  ]
+  ],
+  learnMore: { label: "Manage Azure resource groups (Microsoft Learn)", url: "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal" }
 },
 {
   label: "Resources",
@@ -348,7 +312,8 @@ az provider show --namespace Microsoft.DataFactory --query "registrationState"`,
   guardrails: [
     "Encrypt at rest with a Customer-Managed Key (CMK) in Key Vault or Managed HSM rather than Microsoft-managed keys, if your data classification policy requires it for records tied to customer PII or account data.",
     "Retain audit/diagnostic logs for your regulator's minimum retention period (commonly 7 years under OCC/FFIEC guidance for US banks) in immutable (WORM) storage so logs can't be altered, even by admins."
-  ]
+  ],
+  learnMore: { label: "Introduction to Azure Data Factory (Microsoft Learn)", url: "https://learn.microsoft.com/en-us/azure/data-factory/introduction" }
 },
 {
   label: "Managed endpoint",
@@ -378,7 +343,8 @@ az provider show --namespace Microsoft.DataFactory --query "registrationState"`,
   guardrails: [
     "Many banks treat zero public network access as a hard requirement for anything touching account/transaction data — Private Endpoints aren't a \"Zero Trust nice-to-have\" here, they're often mandatory.",
     "Get network security sign-off on the Private Endpoint/DNS configuration as part of your change/architecture review — this is typically a required control, not optional documentation."
-  ]
+  ],
+  learnMore: { label: "Managed VNet & Private Endpoints (Microsoft Learn)", url: "https://learn.microsoft.com/en-us/azure/data-factory/managed-virtual-network-private-endpoint" }
 },
 {
   label: "Integration runtime",
@@ -414,7 +380,8 @@ az provider show --namespace Microsoft.DataFactory --query "registrationState"`,
   guardrails: [
     "Self-Hosted IR VMs process customer data in memory in transit — confirm the VM image is hardened and patched to your bank's standard, and it's in scope for the same vulnerability-scanning cadence as other production servers.",
     "Retain IR activity logs for the same audit period as the rest of the pipeline — examiners often ask for the full chain of custody, not just the pipeline-level logs."
-  ]
+  ],
+  learnMore: { label: "Integration runtime overview (Microsoft Learn)", url: "https://learn.microsoft.com/en-us/azure/data-factory/concepts-integration-runtime" }
 },
 {
   label: "Linked services",
@@ -455,7 +422,8 @@ ALTER ROLE db_datareader ADD MEMBER [adf-eus2-dev-vidyvibes];
   guardrails: [
     "Tag PII/account-data columns using your bank's data classification taxonomy (e.g. Confidential/Restricted), and keep that tagging consistent with your Snowflake/Metaspace classification so the same data isn't labeled differently across platforms.",
     "Rotate service credentials on the cadence your InfoSec policy mandates (often 90 days for service accounts) — automate via Key Vault rotation policies rather than relying on manual tracking."
-  ]
+  ],
+  learnMore: { label: "Linked services concepts (Microsoft Learn)", url: "https://learn.microsoft.com/en-us/azure/data-factory/concepts-linked-services" }
 },
 {
   label: "Pipelines",
@@ -488,7 +456,8 @@ ALTER ROLE db_datareader ADD MEMBER [adf-eus2-dev-vidyvibes];
   guardrails: [
     "Log a full audit trail for any pipeline touching PII/transaction data — who ran it, when, with what parameters — separately from operational logs. This is typically the first thing examiners ask for.",
     "Enforce maker-checker (dual control): the person who authors a pipeline change should not be the same person who approves it into Production."
-  ]
+  ],
+  learnMore: { label: "Pipelines and activities (Microsoft Learn)", url: "https://learn.microsoft.com/en-us/azure/data-factory/concepts-pipelines-activities" }
 },
 {
   label: "API layer",
@@ -528,7 +497,8 @@ ALTER ROLE db_datareader ADD MEMBER [adf-eus2-dev-vidyvibes];
   guardrails: [
     "If the API exposes customer/account data, APIM with OAuth2 (and consider mutual TLS) is typically the minimum bar — banks rarely accept a subscription-key-only auth model for customer data endpoints.",
     "Log every request/response at the gateway (excluding the sensitive payload itself) for the audit trail, and rate-limit aggressively to contain the blast radius of a compromised credential."
-  ]
+  ],
+  learnMore: { label: "API Management overview & key concepts (Microsoft Learn)", url: "https://learn.microsoft.com/en-us/azure/api-management/api-management-key-concepts" }
 },
 {
   label: "Azure DevOps",
@@ -585,7 +555,8 @@ steps:
   guardrails: [
     "Enforce branch protection and mandatory peer review on the collaboration branch — no direct commits to main for a regulated pipeline.",
     "Require Prod deployment approval from a named individual who is not the author of the change, and keep that approval as part of your change-management evidence."
-  ]
+  ],
+  learnMore: { label: "CI/CD in Azure Data Factory (Microsoft Learn)", url: "https://learn.microsoft.com/en-us/azure/data-factory/continuous-integration-delivery" }
 },
 {
   label: "Agent pools",
@@ -619,7 +590,8 @@ steps:
   guardrails: [
     "Treat self-hosted agent VMs like any other production server — same patch cadence, same vulnerability scanning — since they sit inside your network with a path to Prod.",
     "Restrict pool access to the CI/CD service account only, not broad engineering access, and log every job queued against it."
-  ]
+  ],
+  learnMore: { label: "Azure Pipelines agents overview (Microsoft Learn)", url: "https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops" }
 }
 ];
 
@@ -630,6 +602,9 @@ function renderLayerBody(l) {
   const snippetHtml = l.snippet
     ? `<details class="section-details"><summary>${l.snippetLabel}</summary><pre class="snippet-block">${l.snippet}</pre></details>`
     : '';
+  const learnMoreHtml = l.learnMore
+    ? `<details class="section-details acc-learn"><summary>Learn more</summary><p><a href="${l.learnMore.url}" target="_blank" rel="noopener">${l.learnMore.label}</a><i class="ti ti-external-link" style="font-size:13px;vertical-align:-1px;margin-left:4px"></i></p></details>`
+    : '';
   return `
     <span class="badge">${l.badge}</span>
     <details class="section-details"><summary>Why we needed this</summary><p>${l.why}</p></details>
@@ -639,6 +614,7 @@ function renderLayerBody(l) {
     <details class="section-details acc-apply"><summary>How to adapt</summary><p>${l.apply}</p></details>
     <details class="section-details acc-practice"><summary>Best practices</summary><ul>${l.practices.map(p => `<li>${p}</li>`).join('')}</ul></details>
     <details class="section-details acc-guardrail"><summary>Banking guardrails</summary><ul>${l.guardrails.map(p => `<li>${p}</li>`).join('')}</ul></details>
+    ${learnMoreHtml}
   `;
 }
 
@@ -664,27 +640,17 @@ function buildDiagramSvg() {
   nodesEl.innerHTML = nodes;
 }
 
-function buildFlowSvg() {
-  const linesEl = document.getElementById('flowLines');
-  const nodesEl = document.getElementById('flowNodes');
-  const totalSpan = layerY(layers.length - 1) + LAYOUT.boxH - LAYOUT.startY;
-  let lines = '', nodes = '';
-  layers.forEach((l, i) => {
-    const y = layerY(i);
-    if (i > 0) {
-      const prevY = layerY(i - 1);
-      lines += `<line class="flow-conn" x1="340" y1="${prevY + LAYOUT.boxH}" x2="340" y2="${y}" marker-end="url(#arrow2)"/>`;
-    }
-    const centerY = y + LAYOUT.boxH / 2;
-    const pct = ((centerY - LAYOUT.startY) / totalSpan).toFixed(3);
-    nodes += `<g><rect class="flow-node-rect flow-glow" style="--pct:${pct}" x="190" y="${y}" width="300" height="${LAYOUT.boxH}" rx="8"/><text class="flow-node-text" x="340" y="${centerY}" text-anchor="middle" dominant-baseline="central">${i + 1}. ${l.label}</text></g>`;
-  });
-  linesEl.innerHTML = lines;
-  nodesEl.innerHTML = nodes;
+function buildAboutIndex() {
+  const el = document.getElementById('aboutIndex');
+  el.innerHTML = layers.map((l, i) => `
+    <li><a href="#" onclick="event.preventDefault(); setView('diagram'); selectNode(${i}); window.scrollTo({top:0,behavior:'smooth'});">
+      <span class="num">${i + 1}</span>${l.label}
+    </a></li>
+  `).join('');
 }
 
 buildDiagramSvg();
-buildFlowSvg();
+buildAboutIndex();
 
 let activeNode = null;
 function selectNode(i) {
