@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Azure Data Factory — End-to-End Pipeline Workflow</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2/tabler-icons.min.css">
+<style>
+  :root {
+    --surface-0: #f5f6f8;
+    --surface-1: #eef1f5;
+    --surface-2: #ffffff;
+    --text-primary: #1a1a1a;
+    --text-secondary: #55585e;
+    --text-muted: #8a8d93;
+    --text-accent: #185fa5;
+    --bg-accent: #e6f1fb;
+    --border: #dcdfe4;
+    --border-strong: #c3c7ce;
+    --border-accent: #378add;
+    --radius: 8px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --surface-0: #16181c;
+      --surface-1: #1f2227;
+      --surface-2: #24272d;
+      --text-primary: #eef0f3;
+      --text-secondary: #a9adb4;
+      --text-muted: #767a82;
+      --text-accent: #85b7eb;
+      --bg-accent: #0c447c;
+      --border: #34383f;
+      --border-strong: #454a52;
+      --border-accent: #378add;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--surface-0);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 800px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  header { margin-bottom: 2rem; }
+  h1 { font-size: 26px; font-weight: 600; margin: 0 0 6px; }
+  .subtitle { font-size: 14px; color: var(--text-secondary); margin: 0; }
+  .flow-strip { font-size: 12.5px; color: var(--text-muted); margin-top: 14px; line-height: 1.6; }
+
+  .stage-track { display: flex; gap: 4px; margin-bottom: 1.25rem; overflow-x: auto; padding-bottom: 6px; }
+  .dot-btn { flex: 1; min-width: 64px; display: flex; flex-direction: column; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; padding: 4px 2px; font-family: inherit; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border-strong); transition: background .2s, transform .2s; }
+  .dot.active { background: var(--text-accent); transform: scale(1.3); }
+  .dot.done { background: var(--text-secondary); }
+  .dot-label { font-size: 10.5px; color: var(--text-muted); text-align: center; line-height: 1.25; }
+  .dot-label.active { color: var(--text-accent); font-weight: 600; }
+
+  .panel { background: var(--surface-1); border-radius: 12px; padding: 1.5rem 1.75rem; min-height: 300px; }
+  .badge { display: inline-block; font-size: 12px; padding: 4px 12px; border-radius: var(--radius); background: var(--bg-accent); color: var(--text-accent); margin-bottom: 12px; font-weight: 600; }
+  .panel ul { margin: 0 0 6px; padding-left: 20px; font-size: 14.5px; }
+  .panel li { margin-bottom: 8px; }
+  .apply-box { margin-top: 16px; padding: 12px 16px; background: var(--surface-2); border-left: 3px solid var(--border-accent); border-radius: 0; font-size: 13.5px; color: var(--text-secondary); }
+  .apply-box strong { color: var(--text-primary); }
+
+  .snippet-btn {
+    margin-top: 16px; padding: 8px 14px; font-size: 13.5px; border-radius: var(--radius);
+    background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text-primary);
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: inherit;
+  }
+  .snippet-btn:hover { background: var(--surface-0); }
+  pre.snippet {
+    display: none; margin-top: 12px; padding: 14px 16px; background: #1c1e22; color: #d8dae0;
+    border-radius: var(--radius); font-size: 12.5px; overflow-x: auto; line-height: 1.55;
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  }
+  pre.snippet.open { display: block; }
+
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; }
+  .nav-row button {
+    background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text-primary);
+    padding: 8px 16px; border-radius: var(--radius); cursor: pointer; font-size: 14px; font-family: inherit;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .nav-row button:hover { background: var(--surface-1); }
+  .nav-row button:active { transform: scale(0.98); }
+  #counter { font-size: 12.5px; color: var(--text-muted); }
+
+  footer { margin-top: 2.5rem; font-size: 12.5px; color: var(--text-muted); text-align: center; }
+  footer a { color: var(--text-accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Azure Data Factory — end-to-end pipeline workflow</h1>
+    <p class="subtitle">Click through each stage, from subscription to Azure DevOps CI/CD and agent pools.</p>
+    <div class="flow-strip">Subscription → Resource group → Resources → Managed endpoint → Integration runtime → Linked services → Pipelines → Azure DevOps → Agent pools</div>
+  </header>
+
+  <div class="stage-track" id="track"></div>
+  <div class="panel" id="panel"></div>
+  <div class="nav-row">
+    <button id="prevBtn" onclick="go(current-1)"><i class="ti ti-arrow-left"></i>Back</button>
+    <span id="counter">1 / 9</span>
+    <button id="nextBtn" onclick="go(current+1)">Next<i class="ti ti-arrow-right"></i></button>
+  </div>
+
+  <footer>Built as a reference guide for standing up ADF pipelines end to end.</footer>
+</div>
+
+<script>
+const stages = [
+  {
+    label: "Subscription",
+    badge: "Layer 1 · Billing & access boundary",
+    points: [
+      "Confirm the target subscription (Dev/Test vs Prod) and Subscription ID.",
+      "Register resource providers: Microsoft.DataFactory, Storage, KeyVault, Network.",
+      "Apply tags: Environment, Owner, CostCenter, DataSensitivity.",
+      "Assign RBAC at the narrowest scope that works, not subscription-wide."
+    ],
+    apply: "Adapt: one subscription per environment tier if governance allows it; otherwise isolate by resource group with strict RBAC.",
+    snippetLabel: "Show provider registration commands",
+    snippet: `az provider register --namespace Microsoft.DataFactory
+az provider register --namespace Microsoft.Storage
+az provider register --namespace Microsoft.KeyVault
+az provider show --namespace Microsoft.DataFactory --query "registrationState"`
+  },
+  {
+    label: "Resource group",
+    badge: "Layer 2 · Logical container",
+    points: [
+      "Name it rg-<region>-<env>-<workload>, e.g. rg-eus2-dev-adf-vidyvibes.",
+      "Holds: Data Factory, Storage, Key Vault, VNet, Event Grid topics.",
+      "Apply resource locks (CanNotDelete) on production groups.",
+      "Grant RBAC here, not at the subscription level."
+    ],
+    apply: "Adapt: split into per-zone resource groups (raw/staging/curated) only if separate teams own each zone.",
+    snippetLabel: "Show resource group creation command",
+    snippet: `az group create \\
+  --name rg-eus2-dev-adf-vidyvibes \\
+  --location eastus2 \\
+  --tags Environment=Dev Owner=AK CostCenter=DataEng`
+  },
+  {
+    label: "Resources",
+    badge: "Layer 3 · Core & supporting resources",
+    points: [
+      "Create the Data Factory (V2), enable Managed VNet now if private endpoints are needed later.",
+      "Add Storage Account (ADLS Gen2), Key Vault, Log Analytics workspace.",
+      "Turn on Diagnostic Settings immediately — PipelineRuns, TriggerRuns, ActivityRuns.",
+      "Grant ADF's Managed Identity the RBAC roles it needs on each resource."
+    ],
+    apply: "Adapt: skip Managed VNet at creation only if you're certain private connectivity will never be required — it can't be added retroactively.",
+    snippetLabel: "Show Data Factory creation command",
+    snippet: `az datafactory create \\
+  --resource-group rg-eus2-dev-adf-vidyvibes \\
+  --name adf-eus2-dev-vidyvibes \\
+  --location eastus2`
+  },
+  {
+    label: "Managed endpoint",
+    badge: "Layer 4 · Network isolation",
+    points: [
+      "Only needed if sources/sinks block public network access (Zero Trust posture).",
+      "Create a Managed Private Endpoint in ADF Studio → Manage → Managed private endpoints.",
+      "Approval happens on the target resource (Storage/SQL/Key Vault), not in ADF.",
+      "Use the ADF System-Assigned Managed Identity for RBAC instead of stored secrets."
+    ],
+    apply: "Adapt: if your sources are all public-network-allowed today, you can skip this layer and revisit later — but Managed VNet must already be enabled on the factory.",
+    snippetLabel: "Show setup sequence",
+    snippet: `1. ADF Studio -> Manage -> Managed private endpoints -> New
+2. Select target resource type + resource
+3. Submit request (creates a pending connection)
+4. Go to target resource -> Networking -> Private endpoint connections
+5. Approve the pending request
+6. Status in ADF flips from "Pending" to "Approved"`
+  },
+  {
+    label: "Integration runtime",
+    badge: "Layer 5 · Execution compute",
+    points: [
+      "Azure IR: cloud-to-cloud movement, public or via Managed VNet.",
+      "Self-Hosted IR: required for on-prem or private-network-only sources.",
+      "Azure-SSIS IR: lift-and-shift for legacy SSIS packages.",
+      "Run at least 2 Self-Hosted IR nodes in production for high availability."
+    ],
+    apply: "Adapt: start with AutoResolveIntegrationRuntime (Azure IR) by default; only stand up a Self-Hosted IR once a source genuinely requires private network reach.",
+    snippetLabel: "Show Self-Hosted IR install steps",
+    snippet: `1. ADF Studio -> Manage -> Integration runtimes -> New
+   -> Azure, Self-Hosted -> Self-Hosted -> Create
+2. Copy the generated Authentication Key
+3. On the target VM, install "Microsoft Integration Runtime"
+4. Paste the Authentication Key during setup to register the node
+5. Repeat on a 2nd VM for high availability
+6. Verify status shows "Running" in ADF Studio`
+  },
+  {
+    label: "Linked services",
+    badge: "Layer 6 · Connections",
+    points: [
+      "One connection definition per source/sink system + the IR it uses.",
+      "Create a Key Vault Linked Service first, then reference it from every other Linked Service.",
+      "Prefer Managed Identity auth over stored secrets wherever the connector supports it.",
+      "Naming: LS_<System>_<Env>, e.g. LS_SnowflakeProd."
+    ],
+    apply: "Adapt: for Azure-native services (Storage, SQL, Synapse), drop the Key Vault secret entirely and use Managed Identity end-to-end.",
+    snippetLabel: "Show Key Vault-backed Linked Service JSON",
+    snippet: `{
+  "name": "LS_SnowflakeProd",
+  "properties": {
+    "type": "Snowflake",
+    "typeProperties": {
+      "connectionString": "...",
+      "password": {
+        "type": "AzureKeyVaultSecret",
+        "store": { "referenceName": "LS_KeyVault", "type": "LinkedServiceReference" },
+        "secretName": "snowflake-prod-password"
+      }
+    },
+    "connectVia": { "referenceName": "AutoResolveIntegrationRuntime", "type": "IntegrationRuntimeReference" }
+  }
+}`
+  },
+  {
+    label: "Pipelines",
+    badge: "Layer 7 · Data movement logic",
+    points: [
+      "Parameterize Datasets (filenames, paths, tables) — one dataset, many uses.",
+      "One pipeline per logical workflow, split into sub-pipelines via Execute Pipeline.",
+      "Use Global Parameters for anything environment-specific — never hardcode.",
+      "Wire an On Failure path to a centralized error-logging pipeline + alert."
+    ],
+    apply: "Adapt: choose the trigger type to match the source — Schedule for time-based, Event trigger for file-arrival (matches Event Grid topics like dev-source-file-complete).",
+    snippetLabel: "Show typical pipeline structure",
+    snippet: `1. Trigger fires (schedule or event)
+2. Lookup / Get Metadata confirms source readiness
+3. Copy Activity or Data Flow moves/transforms data
+4. Stored Procedure / Web activity updates control table
+5. On Failure path -> alert (Teams/email) or logging table`
+  },
+  {
+    label: "Azure DevOps",
+    badge: "Layer 8 · Source control & CI/CD",
+    points: [
+      "Configure Git integration: collaboration branch (main) + auto-generated adf_publish branch.",
+      "Prefer automated ARM generation (npm build/export) over manual Publish clicks.",
+      "Release pipeline deploys ARM template per environment via Service Connections.",
+      "Scope Service Connections to the Resource Group, add Approval gates before Prod."
+    ],
+    apply: "Adapt: start with the manual Publish-button flow for a small team, move to the npm-based automated build once you have 2+ environments to promote through.",
+    snippetLabel: "Show sample azure-pipelines.yml (build stage)",
+    snippet: `trigger:
+  branches:
+    include: [ main ]
+
+pool:
+  name: 'MySelfHostedPool'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+
+- script: npm install
+  workingDirectory: '$(Build.Repository.LocalPath)/build'
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: '$(Build.Repository.LocalPath)/build'
+    customCommand: 'run build validate $(Build.Repository.LocalPath) /subscriptions/<subId>/resourceGroups/<rg>/providers/Microsoft.DataFactory/factories/<adfName>'
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: '$(Build.Repository.LocalPath)/build'
+    customCommand: 'run build export $(Build.Repository.LocalPath) /subscriptions/<subId>/resourceGroups/<rg>/providers/Microsoft.DataFactory/factories/<adfName> "ArmTemplateOutput"'
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Build.Repository.LocalPath)/ArmTemplateOutput'
+    artifact: 'ArmTemplates'`
+  },
+  {
+    label: "Agent pools",
+    badge: "Layer 9 · CI/CD compute",
+    points: [
+      "Microsoft-hosted: zero setup, public internet only, capped free minutes.",
+      "Self-hosted: needed if the deploy stage must reach a private/locked-down subscription.",
+      "Register the agent as a service so it survives VM reboots.",
+      "Restrict who can queue jobs against the pool; patch the agent VM regularly."
+    ],
+    apply: "Adapt: use Microsoft-hosted for the build/validate stage, self-hosted only for the deployment stage if network isolation demands it.",
+    snippetLabel: "Show self-hosted agent registration steps",
+    snippet: `1. Azure DevOps -> Organization Settings -> Agent pools
+   -> Add pool -> Self-hosted -> name it e.g. "ADF-Deploy-Pool"
+2. On the target VM, download the agent package
+3. Extract and run ./config.sh (Linux) or config.cmd (Windows)
+4. Provide org URL + a PAT with Agent Pools (read, manage) scope
+5. Run as a service: ./svc.sh install && ./svc.sh start
+6. Reference in YAML: pool: { name: 'ADF-Deploy-Pool' }`
+  }
+];
+
+let current = 0;
+
+function renderTrack() {
+  const track = document.getElementById('track');
+  track.innerHTML = '';
+  stages.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'dot-btn';
+    btn.setAttribute('aria-label', s.label);
+    btn.onclick = () => go(i);
+    btn.innerHTML = `<span class="dot ${i === current ? 'active' : i < current ? 'done' : ''}"></span><span class="dot-label ${i === current ? 'active' : ''}">${s.label}</span>`;
+    track.appendChild(btn);
+  });
+}
+
+function renderPanel() {
+  const s = stages[current];
+  const panel = document.getElementById('panel');
+  panel.innerHTML = `
+    <span class="badge">${s.badge}</span>
+    <ul>${s.points.map(p => `<li>${p}</li>`).join('')}</ul>
+    <div class="apply-box"><strong>How to adapt:</strong> ${s.apply}</div>
+    <button class="snippet-btn" onclick="toggleSnippet()"><i class="ti ti-code"></i>${s.snippetLabel}</button>
+    <pre class="snippet" id="snippet">${s.snippet}</pre>
+  `;
+  document.getElementById('counter').textContent = `${current + 1} / ${stages.length}`;
+  document.getElementById('prevBtn').style.visibility = current === 0 ? 'hidden' : 'visible';
+  const nextLabel = current === stages.length - 1 ? 'Restart' : 'Next';
+  document.getElementById('nextBtn').innerHTML = nextLabel + '<i class="ti ti-arrow-right"></i>';
+}
+
+function toggleSnippet() {
+  document.getElementById('snippet').classList.toggle('open');
+}
+
+function go(i) {
+  if (i >= stages.length) i = 0;
+  if (i < 0) i = 0;
+  current = i;
+  renderTrack();
+  renderPanel();
+}
+
+go(0);
+</script>
+</body>
+</html>
