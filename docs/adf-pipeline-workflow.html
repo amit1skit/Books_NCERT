@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Azure Data Factory — End-to-End Pipeline Workflow</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2/tabler-icons.min.css">
+<style>
+  :root {
+    --surface-0: #f5f6f8;
+    --surface-1: #eef1f5;
+    --surface-2: #ffffff;
+    --text-primary: #1a1a1a;
+    --text-secondary: #55585e;
+    --text-muted: #8a8d93;
+    --text-accent: #185fa5;
+    --bg-accent: #e6f1fb;
+    --border: #dcdfe4;
+    --border-strong: #c3c7ce;
+    --border-accent: #378add;
+    --radius: 8px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --surface-0: #16181c;
+      --surface-1: #1f2227;
+      --surface-2: #24272d;
+      --text-primary: #eef0f3;
+      --text-secondary: #a9adb4;
+      --text-muted: #767a82;
+      --text-accent: #85b7eb;
+      --bg-accent: #0c447c;
+      --border: #34383f;
+      --border-strong: #454a52;
+      --border-accent: #378add;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--surface-0);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 800px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  header { margin-bottom: 2rem; }
+  h1 { font-size: 26px; font-weight: 600; margin: 0 0 6px; }
+  .subtitle { font-size: 14px; color: var(--text-secondary); margin: 0; }
+  .flow-strip { font-size: 12.5px; color: var(--text-muted); margin-top: 14px; line-height: 1.6; }
+
+  .stage-track { display: flex; gap: 4px; margin-bottom: 1.25rem; overflow-x: auto; padding-bottom: 6px; }
+  .dot-btn { flex: 1; min-width: 64px; display: flex; flex-direction: column; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; padding: 4px 2px; font-family: inherit; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border-strong); transition: background .2s, transform .2s; }
+  .dot.active { background: var(--text-accent); transform: scale(1.3); }
+  .dot.done { background: var(--text-secondary); }
+  .dot-label { font-size: 10.5px; color: var(--text-muted); text-align: center; line-height: 1.25; }
+  .dot-label.active { color: var(--text-accent); font-weight: 600; }
+
+  .panel { background: var(--surface-1); border-radius: 12px; padding: 1.5rem 1.75rem; min-height: 300px; }
+  .badge { display: inline-block; font-size: 12px; padding: 4px 12px; border-radius: var(--radius); background: var(--bg-accent); color: var(--text-accent); margin-bottom: 12px; font-weight: 600; }
+  .panel ul { margin: 0 0 6px; padding-left: 20px; font-size: 14.5px; }
+  .panel li { margin-bottom: 8px; }
+  .apply-box { margin-top: 16px; padding: 12px 16px; background: var(--surface-2); border-left: 3px solid var(--border-accent); border-radius: 0; font-size: 13.5px; color: var(--text-secondary); }
+  .apply-box strong { color: var(--text-primary); }
+
+  .snippet-btn {
+    margin-top: 16px; padding: 8px 14px; font-size: 13.5px; border-radius: var(--radius);
+    background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text-primary);
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: inherit;
+  }
+  .snippet-btn:hover { background: var(--surface-0); }
+  pre.snippet {
+    display: none; margin-top: 12px; padding: 14px 16px; background: #1c1e22; color: #d8dae0;
+    border-radius: var(--radius); font-size: 12.5px; overflow-x: auto; line-height: 1.55;
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  }
+  pre.snippet.open { display: block; }
+
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; }
+  .nav-row button {
+    background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text-primary);
+    padding: 8px 16px; border-radius: var(--radius); cursor: pointer; font-size: 14px; font-family: inherit;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .nav-row button:hover { background: var(--surface-1); }
+  .nav-row button:active { transform: scale(0.98); }
+  #counter { font-size: 12.5px; color: var(--text-muted); }
+
+  footer { margin-top: 2.5rem; font-size: 12.5px; color: var(--text-muted); text-align: center; }
+  footer a { color: var(--text-accent); }
+
+  .view-tabs { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+  .tab-btn {
+    flex: 1; padding: 10px 14px; font-size: 14px; border-radius: var(--radius); cursor: pointer;
+    background: var(--surface-1); border: 1px solid var(--border); color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit;
+  }
+  .tab-btn.active { background: var(--bg-accent); border-color: var(--border-accent); color: var(--text-accent); font-weight: 600; }
+
+  .node-rect { fill: var(--surface-2); stroke: var(--border-strong); stroke-width: 0.5; transition: fill .15s, stroke .15s; cursor: pointer; }
+  .node-rect.active { fill: var(--bg-accent); stroke: var(--border-accent); stroke-width: 1; }
+  .node-text { fill: var(--text-primary); font-size: 14px; font-weight: 500; }
+  .node-text.active { fill: var(--text-accent); }
+  .node-group:hover .node-rect:not(.active) { stroke: var(--text-secondary); }
+  .conn-line { stroke: var(--border-strong); stroke-width: 1; }
+  .svg-t { fill: var(--text-primary); font-size: 14px; }
+  .svg-ts { fill: var(--text-muted); font-size: 12px; }
+  .detail-panel { background: var(--surface-1); border-radius: 12px; padding: 1.25rem 1.5rem; margin-top: 1rem; min-height: 200px; }
+  .detail-panel ul { margin: 0 0 6px; padding-left: 20px; font-size: 14.5px; }
+  .detail-panel li { margin-bottom: 8px; line-height: 1.5; }
+  .detail-panel table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+  .detail-panel th { text-align: left; font-weight: 600; color: var(--text-secondary); padding: 6px 8px; border-bottom: 1px solid var(--border-strong); }
+  .detail-panel td { padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+
+  .flow-controls { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+  .flow-controls button {
+    background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text-primary);
+    padding: 6px 12px; border-radius: var(--radius); cursor: pointer; font-size: 13px; font-family: inherit;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .flow-svg-wrap { background: var(--surface-1); border-radius: 12px; padding: 0.5rem 0; }
+  .flow-node-rect { fill: var(--surface-2); stroke: var(--border-strong); stroke-width: 0.5; }
+  .flow-node-text { fill: var(--text-primary); font-size: 13px; font-weight: 500; }
+  .flow-conn { stroke: var(--border-strong); stroke-width: 1; }
+  .flow-packet { fill: var(--text-accent); animation: flowTravel var(--dur, 9s) linear infinite; }
+  .flow-glow { animation: flowGlow var(--dur, 9s) linear infinite; animation-delay: calc(-1 * var(--dur, 9s) * var(--pct, 0)); }
+  @keyframes flowTravel {
+    0% { transform: translateY(0px); opacity: 0; }
+    2% { opacity: 1; }
+    95% { opacity: 1; }
+    100% { transform: translateY(710px); opacity: 0; }
+  }
+  @keyframes flowGlow {
+    0%, 92%, 100% { fill: var(--surface-2); stroke: var(--border-strong); stroke-width: 0.5; }
+    96% { fill: var(--bg-accent); stroke: var(--border-accent); stroke-width: 1.5; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .flow-packet, .flow-glow { animation: none !important; opacity: 1; }
+  }
+  .flow-svg-wrap.paused .flow-packet, .flow-svg-wrap.paused .flow-glow { animation-play-state: paused !important; }
+
+  .flow-legend { display: flex; flex-direction: column; gap: 12px; margin-top: 1.25rem; }
+  .flow-legend-item { display: flex; gap: 12px; align-items: flex-start; font-size: 13.5px; color: var(--text-secondary); }
+  .flow-legend-item strong { color: var(--text-primary); }
+  .flow-num {
+    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--bg-accent); color: var(--text-accent);
+    font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; margin-top: 1px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Azure Data Factory — end-to-end pipeline workflow</h1>
+    <p class="subtitle">Click through each stage, from subscription to Azure DevOps CI/CD and agent pools.</p>
+    <div class="flow-strip">Subscription → Resource group → Resources → Managed endpoint → Integration runtime → Linked services → Pipelines → API layer → Azure DevOps → Agent pools</div>
+  </header>
+
+  <div class="view-tabs">
+    <button class="tab-btn active" id="tab-diagram" onclick="setView('diagram')"><i class="ti ti-sitemap"></i>Diagram view</button>
+    <button class="tab-btn" id="tab-steps" onclick="setView('steps')"><i class="ti ti-list-check"></i>Step-by-step view</button>
+    <button class="tab-btn" id="tab-flow" onclick="setView('flow')"><i class="ti ti-player-play"></i>Data flow animation</button>
+  </div>
+
+  <section id="view-diagram">
+    <svg width="100%" viewBox="0 0 680 800" role="img">
+    <title>Ten layers of an end-to-end Azure Data Factory pipeline</title>
+    <desc>A vertical flow diagram showing Subscription, Resource group, Resources, Managed endpoint, Integration runtime, Linked services, Pipelines, API layer, Azure DevOps, and Agent pools connected in sequence.</desc>
+    <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="var(--border-strong)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    </defs>
+    <line class="conn-line" x1="340" y1="64" x2="340" y2="94" marker-end="url(#arrow)"/>
+    <line class="conn-line" x1="340" y1="138" x2="340" y2="168" marker-end="url(#arrow)"/>
+    <line class="conn-line" x1="340" y1="212" x2="340" y2="242" marker-end="url(#arrow)"/>
+    <line class="conn-line" x1="340" y1="286" x2="340" y2="316" marker-end="url(#arrow)"/>
+    <line class="conn-line" x1="340" y1="360" x2="340" y2="390" marker-end="url(#arrow)"/>
+    <line class="conn-line" x1="340" y1="434" x2="340" y2="464" marker-end="url(#arrow)"/>
+    <line class="conn-line" x1="340" y1="508" x2="340" y2="538" marker-end="url(#arrow)"/>
+    <line class="conn-line" x1="340" y1="582" x2="340" y2="612" marker-end="url(#arrow)"/>
+    <line class="conn-line" x1="340" y1="656" x2="340" y2="686" marker-end="url(#arrow)"/>
+    <g class="node-group" onclick="selectNode(0)"><rect class="node-rect" id="nr-0" x="190" y="20" width="300" height="44" rx="8"/><text class="svg-t node-text" id="nt-0" x="340" y="42" text-anchor="middle" dominant-baseline="central">1. Subscription</text></g>
+    <g class="node-group" onclick="selectNode(1)"><rect class="node-rect" id="nr-1" x="190" y="94" width="300" height="44" rx="8"/><text class="svg-t node-text" id="nt-1" x="340" y="116" text-anchor="middle" dominant-baseline="central">2. Resource group</text></g>
+    <g class="node-group" onclick="selectNode(2)"><rect class="node-rect" id="nr-2" x="190" y="168" width="300" height="44" rx="8"/><text class="svg-t node-text" id="nt-2" x="340" y="190" text-anchor="middle" dominant-baseline="central">3. Resources</text></g>
+    <g class="node-group" onclick="selectNode(3)"><rect class="node-rect" id="nr-3" x="190" y="242" width="300" height="44" rx="8"/><text class="svg-t node-text" id="nt-3" x="340" y="264" text-anchor="middle" dominant-baseline="central">4. Managed endpoint</text></g>
+    <g class="node-group" onclick="selectNode(4)"><rect class="node-rect" id="nr-4" x="190" y="316" width="300" height="44" rx="8"/><text class="svg-t node-text" id="nt-4" x="340" y="338" text-anchor="middle" dominant-baseline="central">5. Integration runtime</text></g>
+    <g class="node-group" onclick="selectNode(5)"><rect class="node-rect" id="nr-5" x="190" y="390" width="300" height="44" rx="8"/><text class="svg-t node-text" id="nt-5" x="340" y="412" text-anchor="middle" dominant-baseline="central">6. Linked services</text></g>
+    <g class="node-group" onclick="selectNode(6)"><rect class="node-rect" id="nr-6" x="190" y="464" width="300" height="44" rx="8"/><text class="svg-t node-text" id="nt-6" x="340" y="486" text-anchor="middle" dominant-baseline="central">7. Pipelines</text></g>
+    <g class="node-group" onclick="selectNode(7)"><rect class="node-rect" id="nr-7" x="190" y="538" width="300" height="44" rx="8"/><text class="svg-t node-text" id="nt-7" x="340" y="560" text-anchor="middle" dominant-baseline="central">8. API layer</text></g>
+    <g class="node-group" onclick="selectNode(8)"><rect class="node-rect" id="nr-8" x="190" y="612" width="300" height="44" rx="8"/><text class="svg-t node-text" id="nt-8" x="340" y="634" text-anchor="middle" dominant-baseline="central">9. Azure DevOps</text></g>
+    <g class="node-group" onclick="selectNode(9)"><rect class="node-rect" id="nr-9" x="190" y="686" width="300" height="44" rx="8"/><text class="svg-t node-text" id="nt-9" x="340" y="708" text-anchor="middle" dominant-baseline="central">10. Agent pools</text></g>
+    <text class="svg-ts" x="340" y="756" text-anchor="middle">Click any layer above for detailed reference information</text>
+    </svg>
+    <div class="detail-panel" id="detail"></div>
+  </section>
+
+  <section id="view-steps" style="display:none">
+    <div class="stage-track" id="track"></div>
+    <div class="panel" id="panel"></div>
+    <div class="nav-row">
+      <button id="prevBtn" onclick="go(current-1)"><i class="ti ti-arrow-left"></i>Back</button>
+      <span id="counter">1 / 10</span>
+      <button id="nextBtn" onclick="go(current+1)">Next<i class="ti ti-arrow-right"></i></button>
+    </div>
+  </section>
+
+  <section id="view-flow" style="display:none">
+    <div class="flow-controls">
+      <button id="pauseBtn" onclick="toggleAnim()"><i class="ti ti-player-pause" id="pauseIcon"></i><span id="pauseLabel">Pause animation</span></button>
+    </div>
+    <div class="flow-svg-wrap" id="flowWrap" style="--dur:9s">
+      <svg width="100%" viewBox="0 0 680 800" role="img">
+      <title>Animated visualization of data flowing through the Azure Data Factory pipeline</title>
+      <desc>A blue dot travels down through all ten pipeline layers in a continuous loop, with each layer briefly highlighting as the dot passes through it, illustrating how a batch of data moves from the subscription and source databases through ingestion, the API layer, and CI/CD deployment.</desc>
+      <defs>
+      <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="var(--border-strong)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+      </defs>
+      <line class="flow-conn" x1="340" y1="64" x2="340" y2="94" marker-end="url(#arrow2)"/>
+      <line class="flow-conn" x1="340" y1="138" x2="340" y2="168" marker-end="url(#arrow2)"/>
+      <line class="flow-conn" x1="340" y1="212" x2="340" y2="242" marker-end="url(#arrow2)"/>
+      <line class="flow-conn" x1="340" y1="286" x2="340" y2="316" marker-end="url(#arrow2)"/>
+      <line class="flow-conn" x1="340" y1="360" x2="340" y2="390" marker-end="url(#arrow2)"/>
+      <line class="flow-conn" x1="340" y1="434" x2="340" y2="464" marker-end="url(#arrow2)"/>
+      <line class="flow-conn" x1="340" y1="508" x2="340" y2="538" marker-end="url(#arrow2)"/>
+      <line class="flow-conn" x1="340" y1="582" x2="340" y2="612" marker-end="url(#arrow2)"/>
+      <line class="flow-conn" x1="340" y1="656" x2="340" y2="686" marker-end="url(#arrow2)"/>
+      <g><rect class="flow-node-rect flow-glow" style="--pct:0.031" x="190" y="20" width="300" height="44" rx="8"/><text class="flow-node-text" x="340" y="42" text-anchor="middle" dominant-baseline="central">1. Subscription</text></g>
+      <g><rect class="flow-node-rect flow-glow" style="--pct:0.135" x="190" y="94" width="300" height="44" rx="8"/><text class="flow-node-text" x="340" y="116" text-anchor="middle" dominant-baseline="central">2. Resource group</text></g>
+      <g><rect class="flow-node-rect flow-glow" style="--pct:0.239" x="190" y="168" width="300" height="44" rx="8"/><text class="flow-node-text" x="340" y="190" text-anchor="middle" dominant-baseline="central">3. Resources (SQL, Storage)</text></g>
+      <g><rect class="flow-node-rect flow-glow" style="--pct:0.344" x="190" y="242" width="300" height="44" rx="8"/><text class="flow-node-text" x="340" y="264" text-anchor="middle" dominant-baseline="central">4. Managed endpoint</text></g>
+      <g><rect class="flow-node-rect flow-glow" style="--pct:0.448" x="190" y="316" width="300" height="44" rx="8"/><text class="flow-node-text" x="340" y="338" text-anchor="middle" dominant-baseline="central">5. Integration runtime</text></g>
+      <g><rect class="flow-node-rect flow-glow" style="--pct:0.552" x="190" y="390" width="300" height="44" rx="8"/><text class="flow-node-text" x="340" y="412" text-anchor="middle" dominant-baseline="central">6. Linked services</text></g>
+      <g><rect class="flow-node-rect flow-glow" style="--pct:0.656" x="190" y="464" width="300" height="44" rx="8"/><text class="flow-node-text" x="340" y="486" text-anchor="middle" dominant-baseline="central">7. Pipelines</text></g>
+      <g><rect class="flow-node-rect flow-glow" style="--pct:0.761" x="190" y="538" width="300" height="44" rx="8"/><text class="flow-node-text" x="340" y="560" text-anchor="middle" dominant-baseline="central">8. API layer</text></g>
+      <g><rect class="flow-node-rect flow-glow" style="--pct:0.865" x="190" y="612" width="300" height="44" rx="8"/><text class="flow-node-text" x="340" y="634" text-anchor="middle" dominant-baseline="central">9. Azure DevOps</text></g>
+      <g><rect class="flow-node-rect flow-glow" style="--pct:0.969" x="190" y="686" width="300" height="44" rx="8"/><text class="flow-node-text" x="340" y="708" text-anchor="middle" dominant-baseline="central">10. Agent pools</text></g>
+      <circle class="flow-packet" cx="340" cy="20" r="6"/>
+      <circle class="flow-packet" cx="340" cy="20" r="6" style="animation-delay: calc(-1 * var(--dur, 9s) * 0.33)"/>
+      <circle class="flow-packet" cx="340" cy="20" r="6" style="animation-delay: calc(-1 * var(--dur, 9s) * 0.66)"/>
+      <text class="svg-ts" x="340" y="756" text-anchor="middle">The dot represents a batch of data moving through the pipeline, end to end</text>
+      </svg>
+    </div>
+    <div class="flow-legend">
+      <div class="flow-legend-item"><span class="flow-num">1</span><div><strong>Source</strong><br>Azure SQL databases (one server, many databases) hold the raw data.</div></div>
+      <div class="flow-legend-item"><span class="flow-num">2</span><div><strong>ADF pipeline</strong><br>Copy Activity pulls from each database via the parameterized Linked Service.</div></div>
+      <div class="flow-legend-item"><span class="flow-num">3</span><div><strong>Curated storage</strong><br>Cleaned, transformed data lands in ADLS Gen2 (or a curated SQL database).</div></div>
+      <div class="flow-legend-item"><span class="flow-num">4</span><div><strong>API layer</strong><br>A Function App (optionally behind API Management) reads the curated data on request.</div></div>
+      <div class="flow-legend-item"><span class="flow-num">5</span><div><strong>Consumers</strong><br>Internal apps, dashboards, or external partners call the API to get data on demand.</div></div>
+    </div>
+  </section>
+
+  <footer>Built as a reference guide for standing up ADF pipelines end to end.</footer>
+</div>
+
+<script>
+function setView(v) {
+  document.getElementById('view-diagram').style.display = v === 'diagram' ? 'block' : 'none';
+  document.getElementById('view-steps').style.display = v === 'steps' ? 'block' : 'none';
+  document.getElementById('view-flow').style.display = v === 'flow' ? 'block' : 'none';
+  document.getElementById('tab-diagram').classList.toggle('active', v === 'diagram');
+  document.getElementById('tab-steps').classList.toggle('active', v === 'steps');
+  document.getElementById('tab-flow').classList.toggle('active', v === 'flow');
+}
+
+function toggleAnim() {
+  const wrap = document.getElementById('flowWrap');
+  const paused = wrap.classList.toggle('paused');
+  document.getElementById('pauseIcon').className = paused ? 'ti ti-player-play' : 'ti ti-player-pause';
+  document.getElementById('pauseLabel').textContent = paused ? 'Play animation' : 'Pause animation';
+}
+
+const details = [
+{badge:"Layer 1 · Billing & access boundary", body:`<ul><li>Confirm target subscription (Dev/Test vs Prod) and note the Subscription ID.</li><li>Register resource providers before creating anything: Microsoft.DataFactory, Storage, KeyVault, Network, EventGrid.</li><li>Apply tags for cost tracking: CostCenter, Environment, Owner, DataSensitivity.</li><li>Check quotas: Data Factories per region, Self-Hosted IR nodes, parallel activity limits.</li></ul>
+<table><tr><th>Role</th><th>Assigned to</th><th>Scope</th><th>Purpose</th></tr>
+<tr><td>Contributor</td><td>ADF deployment service principal</td><td>Resource group</td><td>Create/update ADF via CI/CD</td></tr>
+<tr><td>Data Factory Contributor</td><td>Engineering team</td><td>Resource group</td><td>Author pipelines in ADF Studio</td></tr>
+<tr><td>Storage Blob Data Contributor</td><td>ADF managed identity</td><td>Storage account</td><td>Read/write blobs, no stored keys</td></tr>
+<tr><td>Key Vault Secrets User</td><td>ADF managed identity</td><td>Key vault</td><td>Retrieve secrets for linked services</td></tr>
+<tr><td>Reader</td><td>Auditors / support</td><td>Subscription or RG</td><td>View-only governance visibility</td></tr>
+</table>`},
+{badge:"Layer 2 · Logical container", body:`<ul><li>Naming convention: rg-&lt;region&gt;-&lt;env&gt;-&lt;workload&gt;, e.g. rg-eus2-dev-adf-vidyvibes.</li><li>Holds the Data Factory, Storage accounts, Key Vault, VNet, <b>Azure SQL Server (with its databases)</b>, Self-Hosted IR VM, and Event Grid topics.</li><li><b>SQL Server connectivity:</b> configure firewall rules (allow Azure services, or specific IP ranges) or VNet service endpoints here if you're not using Private Endpoints yet — see Layer 4 for the Private Endpoint route.</li><li>Apply Resource Locks (CanNotDelete) on production groups to prevent accidental deletion.</li><li>Assign RBAC at this scope, not subscription-wide.</li></ul>
+<p style="font-size:13px;color:var(--text-secondary)">Typical contents: Data Factory · Storage Account (ADLS Gen2) · Key Vault · <b>Azure SQL Server</b> (one logical server, multiple databases) · VNet + Private Endpoints · Self-Hosted IR VM · Event Grid Topics · Log Analytics workspace · Function App / API Management.</p>`},
+{badge:"Layer 3 · Core & supporting resources", body:`<ul><li>Create the Data Factory (V2) — enable Managed VNet at creation time if private endpoints will ever be needed; it cannot be added later.</li><li>Add supporting resources: Storage Account, Key Vault, Log Analytics workspace.</li><li>Turn on Diagnostic Settings immediately: PipelineRuns, TriggerRuns, ActivityRuns, SSISIntegrationRuntimeLogs.</li><li>Grant the ADF managed identity RBAC on each target resource.</li><li><b>Azure SQL Server:</b> one logical server (e.g. sql-eus2-dev-vidyvibes) can host multiple databases — you don't create a separate server per database. Note the server's fully qualified name (&lt;server&gt;.database.windows.net) and confirm firewall rules or Private Endpoint access.</li><li>Add an Azure Function App (+ optional API Management) as a resource here if you need to expose curated data via a REST API — see the API layer stage.</li></ul>
+<table><tr><th>Resource</th><th>Purpose</th></tr>
+<tr><td>Storage Account (ADLS Gen2)</td><td>Landing / staging / curated data zones</td></tr>
+<tr><td>Key Vault</td><td>Centralized secret storage</td></tr>
+<tr><td>Azure SQL Server (multi-db)</td><td>One logical server, many databases as sources/sinks</td></tr>
+<tr><td>Event Grid Topic</td><td>Event-driven pipeline triggers</td></tr>
+<tr><td>Log Analytics Workspace</td><td>Centralized diagnostic logs</td></tr>
+<tr><td>Function App / API Management</td><td>Serves curated data to downstream consumers via REST API</td></tr>
+</table>`},
+{badge:"Layer 4 · Network isolation", body:`<ul><li>Needed only when sources/sinks block public network access (Zero Trust posture).</li><li>Create in ADF Studio → Manage → Managed private endpoints → New.</li><li>Approval happens on the <b>target resource</b>, not in ADF — go to Storage/SQL/Key Vault → Networking → Private endpoint connections → Approve.</li><li>Use the ADF System-Assigned Managed Identity for RBAC instead of stored secrets.</li><li><b>Azure SQL Server with multiple databases:</b> a Private Endpoint connects at the logical server level, so one endpoint covers every database under that server — you do not need one endpoint per database.</li><li>If you're also building the API layer (Function App), it needs its own separate VNet Integration to reach the same private SQL server — Function Apps don't share ADF's Managed VNet.</li></ul>
+<p style="font-size:13px;color:var(--text-secondary)">Setup sequence: New endpoint → select target resource → submit request → approve on target resource → status flips from Pending to Approved in ADF.</p>`},
+{badge:"Layer 5 · Execution compute", body:`<table><tr><th>Type</th><th>Use case</th><th>Network reach</th></tr>
+<tr><td>Azure IR</td><td>Cloud-to-cloud movement, Data Flows</td><td>Public, or private via Managed VNet</td></tr>
+<tr><td>Self-Hosted IR</td><td>On-prem / private-network sources</td><td>Outbound-only from your VM</td></tr>
+<tr><td>Azure-SSIS IR</td><td>Lift-and-shift SSIS packages</td><td>Dedicated VM cluster, can join a VNet</td></tr>
+</table>
+<ul><li>Run at least 2 Self-Hosted IR nodes in production for high availability.</li><li>Self-Hosted IR needs outbound HTTPS (443) only — no inbound ports required.</li><li>Size the VM for 4 cores / 8GB RAM minimum for production copy workloads.</li><li><b>Azure SQL Database (PaaS):</b> reachable via AutoResolveIntegrationRuntime (Azure IR), either publicly or privately through Managed VNet + Private Endpoint — no Self-Hosted IR needed.</li><li><b>SQL Server on a VM / on-prem:</b> this does need a Self-Hosted IR, since it isn't a PaaS endpoint Azure IR can reach directly.</li></ul>`},
+{badge:"Layer 6 · Connections", body:`<ul><li>A Linked Service = connection string + the Integration Runtime it uses.</li><li>Create a Key Vault Linked Service first, then reference secrets from it in every other Linked Service.</li><li>Prefer Managed Identity auth over stored secrets wherever the connector supports it.</li><li>Naming: LS_&lt;System&gt;_&lt;Env&gt;, e.g. LS_SnowflakeProd, LS_ADLS_Dev.</li></ul>
+<p style="font-size:14px;font-weight:600;margin:14px 0 6px">Connecting to multiple databases on one Azure SQL Server</p>
+<ul><li><b>Option A — one Linked Service per database.</b> Simplest to read, but N linked services to maintain as databases grow.</li><li><b>Option B — one parameterized Linked Service.</b> Make the database name a parameter and build the connection string dynamically; every Dataset then supplies which database to hit. Preferred once you have more than a handful of databases.</li><li><b>Auth:</b> use Azure AD / Managed Identity instead of SQL logins. Grant access per database (Azure AD auth is server-level for login but role membership is granted per database):</li></ul>
+<pre style="background:#1c1e22;color:#d8dae0;padding:10px 12px;border-radius:6px;font-size:11.5px;overflow-x:auto">-- Run inside EACH target database
+CREATE USER [adf-eus2-dev-vidyvibes] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [adf-eus2-dev-vidyvibes];</pre>
+<p style="font-size:13px;color:var(--text-secondary);margin:10px 0 4px">Parameterized Linked Service (database name supplied at Dataset/pipeline level):</p>
+<pre style="background:#1c1e22;color:#d8dae0;padding:10px 12px;border-radius:6px;font-size:11.5px;overflow-x:auto">{
+  "name": "LS_AzureSqlServer_Dev",
+  "properties": {
+    "type": "AzureSqlDatabase",
+    "parameters": { "databaseName": { "type": "String" } },
+    "typeProperties": {
+      "connectionString": "Server=tcp:sql-eus2-dev-vidyvibes.database.windows.net,1433;Database=@{linkedService().databaseName};Authentication=Active Directory Managed Identity;"
+    },
+    "connectVia": { "referenceName": "AutoResolveIntegrationRuntime", "type": "IntegrationRuntimeReference" }
+  }
+}</pre>`},
+{badge:"Layer 7 · Data movement logic", body:`<ul><li>Parameterize Datasets (filenames, paths, tables) so one dataset serves many pipelines.</li><li>One pipeline per logical workflow, broken into modular sub-pipelines via Execute Pipeline activity.</li><li>Use Global Parameters for anything environment-specific — never hardcode storage/database names.</li><li>Wrap risky activities with On Failure paths into a centralized error-logging pipeline.</li><li>Match trigger type to source: Schedule for time-based, Tumbling Window for backfills, Event trigger for file-arrival (matches Event Grid topics like dev-source-file-complete).</li></ul>
+<p style="font-size:14px;font-weight:600;margin:14px 0 6px">Pulling from multiple databases in one pipeline run</p>
+<ul><li>Maintain a small "database registry" control table (or a JSON array parameter) listing every database name to process.</li><li><b>Lookup activity</b> reads the registry → returns the list of database names.</li><li><b>ForEach activity</b> iterates the list → each iteration calls a parameterized child pipeline via Execute Pipeline, passing that iteration's database name.</li><li>The child pipeline's Copy Activity uses the parameterized Dataset/Linked Service from Layer 6, so the same pipeline logic runs once per database without duplication.</li><li>Set the ForEach to run sequentially (or a capped batch count) if the source databases share the same DTU/vCore pool, to avoid throttling.</li></ul>`},
+{badge:"Layer 8 · Exposing data via API", body:`<ul><li>Pipelines move and transform data — they don't serve it on demand. If downstream consumers need to query curated data whenever they want, you need a separate API layer.</li><li><b>Choose compute:</b> Azure Function App (HTTP trigger) for a lightweight custom endpoint, or Azure API Management (APIM) in front of it for a full gateway (auth, throttling, versioning, developer portal).</li><li>Create the Function App in the same resource group; enable System-Assigned Managed Identity.</li><li>Grant the Function App's identity read access the same way as ADF: <code>CREATE USER ... FROM EXTERNAL PROVIDER</code> + <code>db_datareader</code> in the target database, or Storage Blob Data Reader if serving from Storage.</li><li>Write the HTTP-triggered function to query the database/storage and return JSON.</li><li><b>Private SQL Server:</b> the Function App needs its own Regional VNet Integration to reach it — it does not share ADF's Managed VNet, so this is configured separately.</li><li>Put APIM in front for production: subscription keys or Azure AD OAuth2, rate limiting, a stable public endpoint, and request/response logging.</li><li>Deploy the Function App code and (if used) the APIM API definition through the same Azure DevOps pipeline as ADF, so schema and API changes stay in sync.</li></ul>
+<table><tr><th></th><th>Function App only</th><th>APIM + Function App</th></tr>
+<tr><td>Setup effort</td><td>Low</td><td>Higher — extra resource + policies</td></tr>
+<tr><td>Auth options</td><td>Function keys, Easy Auth</td><td>Subscription keys, OAuth2, IP allow-list</td></tr>
+<tr><td>Best fit</td><td>A handful of internal consumers</td><td>External or many consumers, need throttling/versioning</td></tr>
+</table>`},
+{badge:"Layer 9 · Source control & CI/CD", body:`<ul><li>Git integration: collaboration branch (main) holds human-readable JSON; adf_publish branch holds the auto-generated ARM template.</li><li>Prefer automated ARM generation (npm build validate / build export) over manual Publish-button clicks.</li><li>Release pipeline deploys the ARM template per environment using an ARM Template Deployment task.</li><li>Scope Service Connections to the Resource Group, not the Subscription. Add Approval gates before Prod.</li><li>Add a second deployment task (<code>AzureFunctionApp@2</code>) in the same release to zip-deploy the API layer's Function App code alongside the ADF ARM template — one pipeline, two artifacts, kept in version lockstep.</li></ul>
+<table><tr><th>Branch</th><th>Contents</th><th>Written by</th></tr>
+<tr><td>main / develop</td><td>Human-readable pipeline JSON</td><td>Developers via PR</td></tr>
+<tr><td>adf_publish</td><td>ARM template + parameters</td><td>Publish button or CI build</td></tr>
+</table>`},
+{badge:"Layer 10 · CI/CD compute", body:`<table><tr><th></th><th>Microsoft-hosted</th><th>Self-hosted</th></tr>
+<tr><td>Setup</td><td>None — pick vmImage</td><td>Install agent on your VM</td></tr>
+<tr><td>Network reach</td><td>Public internet only</td><td>Can reach private resources</td></tr>
+<tr><td>Cost</td><td>Capped free minutes/month</td><td>You pay for the VM</td></tr>
+</table>
+<ul><li>Use Microsoft-hosted for build/validate stages, self-hosted only when the deploy stage needs private network reach.</li><li>Register the agent as a service so it survives reboots.</li><li>Restrict who can queue jobs against the pool; patch the agent VM regularly.</li><li>The same pool can run both the ADF ARM deployment task and the Function App deployment task — no need for separate pools per resource type.</li></ul>`}
+];
+let activeNode = null;
+function selectNode(i) {
+  if (activeNode !== null) {
+    document.getElementById('nr-'+activeNode).classList.remove('active');
+    document.getElementById('nt-'+activeNode).classList.remove('active');
+  }
+  activeNode = i;
+  document.getElementById('nr-'+i).classList.add('active');
+  document.getElementById('nt-'+i).classList.add('active');
+  const d = details[i];
+  document.getElementById('detail').innerHTML = '<span class="badge">'+d.badge+'</span>'+d.body;
+}
+selectNode(0);
+const stages = [
+  {
+    label: "Subscription",
+    badge: "Layer 1 · Billing & access boundary",
+    points: [
+      "Confirm the target subscription (Dev/Test vs Prod) and Subscription ID.",
+      "Register resource providers: Microsoft.DataFactory, Storage, KeyVault, Network.",
+      "Apply tags: Environment, Owner, CostCenter, DataSensitivity.",
+      "Assign RBAC at the narrowest scope that works, not subscription-wide."
+    ],
+    apply: "Adapt: one subscription per environment tier if governance allows it; otherwise isolate by resource group with strict RBAC.",
+    snippetLabel: "Show provider registration commands",
+    snippet: `az provider register --namespace Microsoft.DataFactory
+az provider register --namespace Microsoft.Storage
+az provider register --namespace Microsoft.KeyVault
+az provider show --namespace Microsoft.DataFactory --query "registrationState"`
+  },
+  {
+    label: "Resource group",
+    badge: "Layer 2 · Logical container",
+    points: [
+      "Name it rg-<region>-<env>-<workload>, e.g. rg-eus2-dev-adf-vidyvibes.",
+      "Holds: Data Factory, Storage, Key Vault, VNet, Azure SQL Server (with its databases), Event Grid topics.",
+      "Azure SQL Server connectivity: configure firewall rules (allow Azure services, or specific IP ranges) or VNet service endpoints here if you're not using Private Endpoints yet.",
+      "Apply resource locks (CanNotDelete) on production groups.",
+      "Grant RBAC here, not at the subscription level."
+    ],
+    apply: "Adapt: split into per-zone resource groups (raw/staging/curated) only if separate teams own each zone.",
+    snippetLabel: "Show resource group creation command",
+    snippet: `az group create \\
+  --name rg-eus2-dev-adf-vidyvibes \\
+  --location eastus2 \\
+  --tags Environment=Dev Owner=AK CostCenter=DataEng`
+  },
+  {
+    label: "Resources",
+    badge: "Layer 3 · Core & supporting resources",
+    points: [
+      "Create the Data Factory (V2), enable Managed VNet now if private endpoints are needed later.",
+      "Add Storage Account (ADLS Gen2), Key Vault, Log Analytics workspace.",
+      "Turn on Diagnostic Settings immediately — PipelineRuns, TriggerRuns, ActivityRuns.",
+      "Grant ADF's Managed Identity the RBAC roles it needs on each resource.",
+      "Azure SQL Server: one logical server can host multiple databases — note the server FQDN and firewall/Private Endpoint config.",
+      "Add a Function App (+ optional API Management) here if you'll expose curated data via a REST API."
+    ],
+    apply: "Adapt: skip Managed VNet at creation only if you're certain private connectivity will never be required — it can't be added retroactively.",
+    snippetLabel: "Show Data Factory creation command",
+    snippet: `az datafactory create \\
+  --resource-group rg-eus2-dev-adf-vidyvibes \\
+  --name adf-eus2-dev-vidyvibes \\
+  --location eastus2`
+  },
+  {
+    label: "Managed endpoint",
+    badge: "Layer 4 · Network isolation",
+    points: [
+      "Only needed if sources/sinks block public network access (Zero Trust posture).",
+      "Create a Managed Private Endpoint in ADF Studio → Manage → Managed private endpoints.",
+      "Approval happens on the target resource (Storage/SQL/Key Vault), not in ADF.",
+      "Use the ADF System-Assigned Managed Identity for RBAC instead of stored secrets.",
+      "One Private Endpoint on the Azure SQL Server covers every database under it — no need for one per database.",
+      "The API layer's Function App needs its own separate VNet Integration to reach the same private SQL server."
+    ],
+    apply: "Adapt: if your sources are all public-network-allowed today, you can skip this layer and revisit later — but Managed VNet must already be enabled on the factory.",
+    snippetLabel: "Show setup sequence",
+    snippet: `1. ADF Studio -> Manage -> Managed private endpoints -> New
+2. Select target resource type + resource
+3. Submit request (creates a pending connection)
+4. Go to target resource -> Networking -> Private endpoint connections
+5. Approve the pending request
+6. Status in ADF flips from "Pending" to "Approved"`
+  },
+  {
+    label: "Integration runtime",
+    badge: "Layer 5 · Execution compute",
+    points: [
+      "Azure IR: cloud-to-cloud movement, public or via Managed VNet.",
+      "Self-Hosted IR: required for on-prem or private-network-only sources.",
+      "Azure-SSIS IR: lift-and-shift for legacy SSIS packages.",
+      "Run at least 2 Self-Hosted IR nodes in production for high availability.",
+      "Azure SQL Database (PaaS): reachable via Azure IR, public or private via Managed VNet — no Self-Hosted IR needed.",
+      "SQL Server on a VM/on-prem: does need a Self-Hosted IR, since Azure IR can't reach it directly."
+    ],
+    apply: "Adapt: start with AutoResolveIntegrationRuntime (Azure IR) by default; only stand up a Self-Hosted IR once a source genuinely requires private network reach.",
+    snippetLabel: "Show Self-Hosted IR install steps",
+    snippet: `1. ADF Studio -> Manage -> Integration runtimes -> New
+   -> Azure, Self-Hosted -> Self-Hosted -> Create
+2. Copy the generated Authentication Key
+3. On the target VM, install "Microsoft Integration Runtime"
+4. Paste the Authentication Key during setup to register the node
+5. Repeat on a 2nd VM for high availability
+6. Verify status shows "Running" in ADF Studio`
+  },
+  {
+    label: "Linked services",
+    badge: "Layer 6 · Connections",
+    points: [
+      "One connection definition per source/sink system + the IR it uses.",
+      "Create a Key Vault Linked Service first, then reference it from every other Linked Service.",
+      "Prefer Managed Identity auth over stored secrets wherever the connector supports it.",
+      "Naming: LS_<System>_<Env>, e.g. LS_SnowflakeProd.",
+      "Multiple databases on one Azure SQL Server: use a single parameterized Linked Service with databaseName as a parameter, rather than one Linked Service per database.",
+      "Grant Azure AD access per database: CREATE USER ... FROM EXTERNAL PROVIDER + db_datareader, run once inside each target database."
+    ],
+    apply: "Adapt: for Azure-native services (Storage, SQL, Synapse), drop the Key Vault secret entirely and use Managed Identity end-to-end.",
+    snippetLabel: "Show parameterized Azure SQL Linked Service JSON",
+    snippet: `-- Run inside EACH target database
+CREATE USER [adf-eus2-dev-vidyvibes] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [adf-eus2-dev-vidyvibes];
+
+// Linked Service (one server, many databases)
+{
+  "name": "LS_AzureSqlServer_Dev",
+  "properties": {
+    "type": "AzureSqlDatabase",
+    "parameters": { "databaseName": { "type": "String" } },
+    "typeProperties": {
+      "connectionString": "Server=tcp:sql-eus2-dev-vidyvibes.database.windows.net,1433;Database=@{linkedService().databaseName};Authentication=Active Directory Managed Identity;"
+    },
+    "connectVia": { "referenceName": "AutoResolveIntegrationRuntime", "type": "IntegrationRuntimeReference" }
+  }
+}`
+  },
+  {
+    label: "Pipelines",
+    badge: "Layer 7 · Data movement logic",
+    points: [
+      "Parameterize Datasets (filenames, paths, tables) — one dataset, many uses.",
+      "One pipeline per logical workflow, split into sub-pipelines via Execute Pipeline.",
+      "Use Global Parameters for anything environment-specific — never hardcode.",
+      "Wire an On Failure path to a centralized error-logging pipeline + alert.",
+      "Multiple databases: Lookup a database registry, then ForEach over it, calling a parameterized child pipeline per database."
+    ],
+    apply: "Adapt: choose the trigger type to match the source — Schedule for time-based, Event trigger for file-arrival (matches Event Grid topics like dev-source-file-complete).",
+    snippetLabel: "Show multi-database iteration structure",
+    snippet: `1. Lookup activity -> reads database registry table
+   (or a JSON array parameter of database names)
+2. ForEach activity -> iterates the list
+3.   Execute Pipeline -> calls child pipeline,
+     passing this iteration's database name
+4.     Child pipeline's Copy Activity uses the
+       parameterized Dataset/Linked Service
+5. On Failure path -> alert (Teams/email) or logging table`
+  },
+  {
+    label: "API layer",
+    badge: "Layer 8 · Exposing data via API",
+    points: [
+      "Pipelines move data — they don't serve it on demand. Add this layer if consumers need to query curated data whenever they want.",
+      "Azure Function App (HTTP trigger) for a lightweight endpoint, or Azure API Management (APIM) in front of it for a full gateway.",
+      "Grant the Function App's Managed Identity read access the same way as ADF — db_datareader in the target database, or Storage Blob Data Reader.",
+      "Private SQL Server: the Function App needs its own Regional VNet Integration — it does not share ADF's Managed VNet.",
+      "Put APIM in front for production: subscription keys or Azure AD OAuth2, rate limiting, a stable public endpoint."
+    ],
+    apply: "Adapt: a single Function App is enough for a handful of internal consumers; add APIM once you have external consumers or need throttling/versioning.",
+    snippetLabel: "Show Function App setup sequence",
+    snippet: `1. Create Function App (Consumption or Premium plan)
+   in the same resource group as ADF
+2. Enable System-Assigned Managed Identity
+3. Grant it db_datareader on the target database:
+   CREATE USER [func-app-name] FROM EXTERNAL PROVIDER;
+   ALTER ROLE db_datareader ADD MEMBER [func-app-name];
+4. Write an HTTP-triggered function that queries
+   the database and returns JSON
+5. (Private SQL) Add Regional VNet Integration
+   on the Function App to reach it privately
+6. (Production) Import into API Management,
+   apply subscription-key or OAuth2 policy`
+  },
+  {
+    label: "Azure DevOps",
+    badge: "Layer 9 · Source control & CI/CD",
+    points: [
+      "Configure Git integration: collaboration branch (main) + auto-generated adf_publish branch.",
+      "Prefer automated ARM generation (npm build/export) over manual Publish clicks.",
+      "Release pipeline deploys ARM template per environment via Service Connections.",
+      "Scope Service Connections to the Resource Group, add Approval gates before Prod.",
+      "Add an AzureFunctionApp@2 task in the same release to deploy the API layer's Function App alongside the ADF ARM template."
+    ],
+    apply: "Adapt: start with the manual Publish-button flow for a small team, move to the npm-based automated build once you have 2+ environments to promote through.",
+    snippetLabel: "Show sample azure-pipelines.yml (build stage)",
+    snippet: `trigger:
+  branches:
+    include: [ main ]
+
+pool:
+  name: 'MySelfHostedPool'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+
+- script: npm install
+  workingDirectory: '$(Build.Repository.LocalPath)/build'
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: '$(Build.Repository.LocalPath)/build'
+    customCommand: 'run build validate $(Build.Repository.LocalPath) /subscriptions/<subId>/resourceGroups/<rg>/providers/Microsoft.DataFactory/factories/<adfName>'
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: '$(Build.Repository.LocalPath)/build'
+    customCommand: 'run build export $(Build.Repository.LocalPath) /subscriptions/<subId>/resourceGroups/<rg>/providers/Microsoft.DataFactory/factories/<adfName> "ArmTemplateOutput"'
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Build.Repository.LocalPath)/ArmTemplateOutput'
+    artifact: 'ArmTemplates'`
+  },
+  {
+    label: "Agent pools",
+    badge: "Layer 10 · CI/CD compute",
+    points: [
+      "Microsoft-hosted: zero setup, public internet only, capped free minutes.",
+      "Self-hosted: needed if the deploy stage must reach a private/locked-down subscription.",
+      "Register the agent as a service so it survives VM reboots.",
+      "Restrict who can queue jobs against the pool; patch the agent VM regularly.",
+      "The same pool can run both the ADF deployment task and the Function App deployment task."
+    ],
+    apply: "Adapt: use Microsoft-hosted for the build/validate stage, self-hosted only for the deployment stage if network isolation demands it.",
+    snippetLabel: "Show self-hosted agent registration steps",
+    snippet: `1. Azure DevOps -> Organization Settings -> Agent pools
+   -> Add pool -> Self-hosted -> name it e.g. "ADF-Deploy-Pool"
+2. On the target VM, download the agent package
+3. Extract and run ./config.sh (Linux) or config.cmd (Windows)
+4. Provide org URL + a PAT with Agent Pools (read, manage) scope
+5. Run as a service: ./svc.sh install && ./svc.sh start
+6. Reference in YAML: pool: { name: 'ADF-Deploy-Pool' }`
+  }
+];
+
+let current = 0;
+
+function renderTrack() {
+  const track = document.getElementById('track');
+  track.innerHTML = '';
+  stages.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'dot-btn';
+    btn.setAttribute('aria-label', s.label);
+    btn.onclick = () => go(i);
+    btn.innerHTML = `<span class="dot ${i === current ? 'active' : i < current ? 'done' : ''}"></span><span class="dot-label ${i === current ? 'active' : ''}">${s.label}</span>`;
+    track.appendChild(btn);
+  });
+}
+
+function renderPanel() {
+  const s = stages[current];
+  const panel = document.getElementById('panel');
+  panel.innerHTML = `
+    <span class="badge">${s.badge}</span>
+    <ul>${s.points.map(p => `<li>${p}</li>`).join('')}</ul>
+    <div class="apply-box"><strong>How to adapt:</strong> ${s.apply}</div>
+    <button class="snippet-btn" onclick="toggleSnippet()"><i class="ti ti-code"></i>${s.snippetLabel}</button>
+    <pre class="snippet" id="snippet">${s.snippet}</pre>
+  `;
+  document.getElementById('counter').textContent = `${current + 1} / ${stages.length}`;
+  document.getElementById('prevBtn').style.visibility = current === 0 ? 'hidden' : 'visible';
+  const nextLabel = current === stages.length - 1 ? 'Restart' : 'Next';
+  document.getElementById('nextBtn').innerHTML = nextLabel + '<i class="ti ti-arrow-right"></i>';
+}
+
+function toggleSnippet() {
+  document.getElementById('snippet').classList.toggle('open');
+}
+
+function go(i) {
+  if (i >= stages.length) i = 0;
+  if (i < 0) i = 0;
+  current = i;
+  renderTrack();
+  renderPanel();
+}
+
+go(0);
+</script>
+</body>
+</html>
